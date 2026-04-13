@@ -1,0 +1,219 @@
+"use client";
+import { useState, useRef } from "react";
+import { WalletProvider, useWallet } from "../components/WalletContext";
+import GameLayout from "../components/GameLayout";
+import BetHistory, { BetRecord } from "../components/BetHistory";
+
+const BET_AMOUNTS = [0.1, 0.25, 0.5, 1, 2, 5];
+const HOUSE_EDGE = 0.05;
+const ICON = <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <ellipse cx="12" cy="12" rx="9.5" ry="9.5" fill="currentColor" fillOpacity=".12" stroke="currentColor" strokeWidth="1.5"/>
+  <ellipse cx="12" cy="12" rx="7" ry="7" stroke="currentColor" strokeWidth="1" strokeDasharray="2.5 2"/>
+  <text x="12" y="16.5" textAnchor="middle" fontSize="10" fontWeight="bold" fill="currentColor" fontFamily="monospace">◎</text>
+</svg>;
+
+function CoinFlipGame() {
+  const { connected, balance, updateBalance, connect } = useWallet();
+  const [side, setSide] = useState<"heads" | "tails" | null>(null);
+  const [betAmount, setBetAmount] = useState(0.1);
+  const [customBet, setCustomBet] = useState("");
+  const [spinning, setSpinning] = useState(false);
+  const [result, setResult] = useState<null | { outcome: "heads" | "tails"; won: boolean; payout: number }>(null);
+  const [history, setHistory] = useState<BetRecord[]>([]);
+  const [streak, setStreak] = useState(0);
+  const coinRef = useRef<HTMLDivElement>(null);
+
+  const activeBet = customBet !== "" ? parseFloat(customBet) || 0 : betAmount;
+  const payout = activeBet * (2 - HOUSE_EDGE);
+
+  const flip = async () => {
+    if (!connected || !side || activeBet <= 0 || activeBet > balance || spinning) return;
+    setSpinning(true); setResult(null);
+    await new Promise(r => setTimeout(r, 1400));
+    const outcome: "heads" | "tails" = Math.random() < 0.5 ? "heads" : "tails";
+    const won = outcome === side;
+    updateBalance(won ? balance - activeBet + payout : balance - activeBet);
+    setStreak(s => won ? s + 1 : 0);
+    setHistory(h => [...h, { id: Date.now().toString(), game: `Coin Flip (${side})`, amount: activeBet, result: won ? "win" : "loss", payout, time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) }]);
+    setResult({ outcome, won, payout });
+    setSpinning(false);
+  };
+
+  const pnl = history.reduce((a, h) => a + (h.result === "win" ? h.payout - h.amount : -h.amount), 0);
+
+  return (
+    <GameLayout title="COIN FLIP" accent="#10b981" icon={ICON}>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 320px", gap: 20, alignItems: "start" }}>
+
+        {/* LEFT: game + controls */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+
+          {/* Coin display */}
+          <div style={{
+            borderRadius: 20, overflow: "hidden",
+            background: "linear-gradient(145deg, #001a0d 0%, #002618 60%, #001208 100%)",
+            border: "1px solid rgba(16,185,129,0.2)",
+            boxShadow: "0 0 60px rgba(16,185,129,0.06), 0 8px 40px rgba(0,0,0,0.5)",
+            minHeight: 360, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+            gap: 24, position: "relative",
+          }}>
+            {/* Grid bg */}
+            <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(rgba(16,185,129,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(16,185,129,0.04) 1px, transparent 1px)", backgroundSize: "40px 40px" }}/>
+            {/* Glow */}
+            <div style={{ position: "absolute", width: 300, height: 300, borderRadius: "50%", background: "radial-gradient(circle, rgba(16,185,129,0.12) 0%, transparent 70%)", filter: "blur(40px)" }}/>
+
+            {/* Coin */}
+            <div ref={coinRef} style={{ position: "relative", zIndex: 2 }}>
+              <div className={spinning ? "coin-spinning" : ""} style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <div style={{
+                  width: 140, height: 140, borderRadius: "50%",
+                  background: spinning ? "linear-gradient(135deg, #10b981, #059669)" :
+                    result ? (result.outcome === "heads"
+                      ? "linear-gradient(135deg, #10b981, #34d399)"
+                      : "linear-gradient(135deg, #6b7280, #9ca3af)")
+                    : "linear-gradient(135deg, #10b981, #059669)",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  boxShadow: result && result.outcome === "heads"
+                    ? "0 0 40px rgba(16,185,129,0.6), 0 0 80px rgba(16,185,129,0.2)"
+                    : "0 0 30px rgba(16,185,129,0.3)",
+                  fontSize: 60, fontWeight: 900,
+                  border: "4px solid rgba(255,255,255,0.15)",
+                }}>
+                  {spinning ? "◎" : result ? (result.outcome === "heads" ? "◎" : "◌") : "◎"}
+                </div>
+              </div>
+            </div>
+
+            {/* Result */}
+            <div style={{ position: "relative", zIndex: 2, textAlign: "center" }}>
+              {spinning && (
+                <div style={{ fontSize: 13, color: "#4b5563", letterSpacing: 3, textTransform: "uppercase" }}>Flipping...</div>
+              )}
+              {result && !spinning && (
+                <div>
+                  <div style={{ fontFamily: "var(--font-orbitron, monospace)", fontWeight: 900, fontSize: 26, letterSpacing: 3, color: result.won ? "#10b981" : "#ef4444", textShadow: result.won ? "0 0 20px #10b981" : "0 0 20px #ef4444", marginBottom: 6 }}>
+                    {result.won ? "YOU WON!" : "YOU LOST"}
+                  </div>
+                  <div style={{ fontSize: 13, color: "#6b7280" }}>
+                    Landed: <span style={{ color: "#fff", fontWeight: 700, textTransform: "uppercase" }}>{result.outcome}</span>
+                    <span style={{ color: result.won ? "#10b981" : "#ef4444", fontWeight: 700, marginLeft: 8 }}>
+                      {result.won ? `+${result.payout.toFixed(3)} ◎` : `-${activeBet.toFixed(3)} ◎`}
+                    </span>
+                  </div>
+                  {streak > 1 && result.won && (
+                    <div style={{ marginTop: 8, fontSize: 12, color: "#f59e0b", fontWeight: 700, textShadow: "0 0 10px #f59e0b", display:"flex", alignItems:"center", gap:5 }}>
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="#f59e0b" stroke="#f59e0b" strokeWidth="1"><path d="M12 2c0 6-6 8-6 13a6 6 0 0012 0c0-5-6-7-6-13z"/></svg> {streak} WIN STREAK!
+                    </div>
+                  )}
+                </div>
+              )}
+              {!spinning && !result && (
+                <div style={{ fontSize: 12, color: "#374151", letterSpacing: 2, textTransform: "uppercase" }}>
+                  {side ? `Selected: ${side.toUpperCase()}` : "Pick a side to begin"}
+                </div>
+              )}
+            </div>
+
+            {/* Side selector */}
+            <div style={{ position: "relative", zIndex: 2, display: "flex", gap: 12 }}>
+              {(["heads", "tails"] as const).map(s => (
+                <button key={s} onClick={() => setSide(s)} disabled={spinning}
+                  style={{
+                    padding: "12px 32px", borderRadius: 12, fontSize: 13, fontWeight: 800,
+                    letterSpacing: 2, textTransform: "uppercase", cursor: "pointer", transition: "all 0.2s",
+                    background: side === s
+                      ? (s === "heads" ? "#10b981" : "#6b7280")
+                      : "rgba(255,255,255,0.04)",
+                    color: side === s ? "#fff" : "#4b5563",
+                    border: side === s
+                      ? (s === "heads" ? "1px solid #10b981" : "1px solid #6b7280")
+                      : "1px solid var(--border)",
+                    boxShadow: side === s ? (s === "heads" ? "0 0 20px rgba(16,185,129,0.5)" : "0 0 16px rgba(107,114,128,0.4)") : "none",
+                    opacity: spinning ? 0.5 : 1,
+                  }}>
+                  {s === "heads" ? "◎ Heads" : "◌ Tails"}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Bet controls */}
+          <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 18, padding: 22 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 16 }}>
+              <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: "#4b5563" }}>Bet Amount</span>
+              <span style={{ fontSize: 12, color: "#4b5563" }}>Balance: <span style={{ color: "#10b981", fontWeight: 700 }}>{balance.toFixed(3)} ◎</span></span>
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(6,1fr)", gap: 8, marginBottom: 12 }}>
+              {BET_AMOUNTS.map(amt => (
+                <button key={amt} onClick={() => { setBetAmount(amt); setCustomBet(""); }}
+                  disabled={spinning || amt > balance}
+                  style={{
+                    padding: "9px 0", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer", transition: "all 0.15s",
+                    background: betAmount === amt && customBet === "" ? "#10b981" : "rgba(255,255,255,0.04)",
+                    color: betAmount === amt && customBet === "" ? "#000" : "#6b7280",
+                    border: betAmount === amt && customBet === "" ? "1px solid #10b981" : "1px solid var(--border)",
+                    opacity: spinning || amt > balance ? 0.4 : 1,
+                  }}>{amt}</button>
+              ))}
+            </div>
+            <div style={{ display: "flex", gap: 8, marginBottom: 8 }}>
+              <input type="number" min="0.01" max={balance} step="0.01" placeholder="Custom amount..."
+                value={customBet} onChange={e => setCustomBet(e.target.value)} disabled={spinning}
+                style={{ flex: 1, background: "rgba(255,255,255,0.04)", border: "1px solid var(--border)", borderRadius: 8, padding: "9px 12px", fontSize: 13, color: "#fff", outline: "none", fontFamily: "inherit" }}/>
+              {[["MAX", () => setCustomBet(balance.toFixed(2))], ["½", () => setCustomBet((activeBet / 2).toFixed(2))], ["2×", () => setCustomBet((activeBet * 2).toFixed(2))]].map(([label, action]) => (
+                <button key={label as string} onClick={action as () => void} disabled={spinning}
+                  style={{ padding: "9px 12px", borderRadius: 8, fontSize: 11, fontWeight: 700, cursor: "pointer", background: "rgba(255,255,255,0.04)", border: "1px solid var(--border)", color: "#6b7280", transition: "all 0.15s" }}>
+                  {label as string}
+                </button>
+              ))}
+            </div>
+            <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: "#374151", padding: "8px 4px 14px" }}>
+              <span>Bet: <span style={{ color: "#fff", fontWeight: 600 }}>{activeBet.toFixed(3)} ◎</span></span>
+              <span>Win: <span style={{ color: "#10b981", fontWeight: 600 }}>{payout.toFixed(3)} ◎</span></span>
+              <span>Net: <span style={{ color: "#10b981", fontWeight: 600 }}>+{(payout - activeBet).toFixed(3)} ◎</span></span>
+            </div>
+            {connected ? (
+              <button onClick={flip} disabled={!side || activeBet <= 0 || activeBet > balance || spinning}
+                className="btn-green" style={{ width: "100%", padding: "14px", fontSize: 14, letterSpacing: 2, borderRadius: 12, opacity: (!side || spinning || activeBet > balance) ? 0.5 : 1 }}>
+                {spinning ? "FLIPPING..." : side ? `FLIP ${side.toUpperCase()}` : "SELECT A SIDE FIRST"}
+              </button>
+            ) : (
+              <button onClick={connect} className="btn-primary" style={{ width: "100%", padding: "14px", fontSize: 14, letterSpacing: 2, borderRadius: 12 }}>CONNECT WALLET</button>
+            )}
+          </div>
+        </div>
+
+        {/* RIGHT: stats */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 14, position: "sticky", top: 84 }}>
+          <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 16, padding: 20 }}>
+            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: 3, textTransform: "uppercase", color: "#374151", marginBottom: 16 }}>Session Stats</div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              {[
+                { label: "Bets placed", value: history.length, color: "#fff" },
+                { label: "Wins", value: history.filter(h => h.result === "win").length, color: "#10b981" },
+                { label: "Losses", value: history.filter(h => h.result === "loss").length, color: "#ef4444" },
+                { label: "Win streak", value: `${streak}×`, color: "#f59e0b" },
+              ].map(s => (
+                <div key={s.label} style={{ display: "flex", justifyContent: "space-between", fontSize: 13 }}>
+                  <span style={{ color: "#4b5563" }}>{s.label}</span>
+                  <span style={{ fontWeight: 700, color: s.color, fontFamily: "var(--font-orbitron, monospace)" }}>{s.value}</span>
+                </div>
+              ))}
+              <div style={{ borderTop: "1px solid var(--border)", paddingTop: 12, display: "flex", justifyContent: "space-between", fontSize: 13 }}>
+                <span style={{ color: "#4b5563" }}>P&L</span>
+                <span style={{ fontWeight: 800, color: pnl >= 0 ? "#10b981" : "#ef4444", fontFamily: "var(--font-orbitron, monospace)" }}>
+                  {pnl >= 0 ? "+" : ""}{pnl.toFixed(3)} ◎
+                </span>
+              </div>
+            </div>
+          </div>
+          <BetHistory history={history} />
+        </div>
+      </div>
+    </GameLayout>
+  );
+}
+
+export default function CoinFlipPage() {
+  return <WalletProvider><CoinFlipGame /></WalletProvider>;
+}
