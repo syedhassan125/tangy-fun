@@ -1,5 +1,6 @@
 "use client";
 import { useState, useRef } from "react";
+import Image from "next/image";
 import { WalletProvider, useWallet } from "../components/WalletContext";
 import GameLayout from "../components/GameLayout";
 import BetHistory, { BetRecord } from "../components/BetHistory";
@@ -67,19 +68,45 @@ function CoinFlipGame() {
               <div className={spinning ? "coin-spinning" : ""} style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
                 <div style={{
                   width: 140, height: 140, borderRadius: "50%",
-                  background: spinning ? "linear-gradient(135deg, #10b981, #059669)" :
+                  background: spinning ? "linear-gradient(135deg, #f59e0b, #d97706)" :
                     result ? (result.outcome === "heads"
-                      ? "linear-gradient(135deg, #10b981, #34d399)"
-                      : "linear-gradient(135deg, #6b7280, #9ca3af)")
-                    : "linear-gradient(135deg, #10b981, #059669)",
+                      ? "linear-gradient(135deg, #f59e0b, #fbbf24)"
+                      : "linear-gradient(135deg, #4ade80, #22c55e)")
+                    : "linear-gradient(135deg, #f59e0b, #d97706)",
                   display: "flex", alignItems: "center", justifyContent: "center",
                   boxShadow: result && result.outcome === "heads"
-                    ? "0 0 40px rgba(16,185,129,0.6), 0 0 80px rgba(16,185,129,0.2)"
-                    : "0 0 30px rgba(16,185,129,0.3)",
-                  fontSize: 60, fontWeight: 900,
-                  border: "4px solid rgba(255,255,255,0.15)",
+                    ? "0 0 40px rgba(245,158,11,0.7), 0 0 80px rgba(245,158,11,0.3)"
+                    : result && result.outcome === "tails"
+                    ? "0 0 40px rgba(74,222,128,0.6), 0 0 80px rgba(74,222,128,0.2)"
+                    : "0 0 30px rgba(245,158,11,0.4)",
+                  border: "4px solid rgba(255,255,255,0.2)",
+                  overflow: "hidden", position: "relative",
                 }}>
-                  {spinning ? "◎" : result ? (result.outcome === "heads" ? "◎" : "◌") : "◎"}
+                  {/* Heads: tangy logo */}
+                  {(!result || result.outcome === "heads") && (
+                    <Image
+                      src="/tangy-logo.png"
+                      alt="TANGY"
+                      width={100}
+                      height={118}
+                      style={{ objectFit: "contain", mixBlendMode: "screen", position: "relative", zIndex: 1 }}
+                    />
+                  )}
+                  {/* Tails: lime SVG */}
+                  {result && result.outcome === "tails" && (
+                    <svg width="72" height="72" viewBox="0 0 72 72" fill="none" style={{ position: "relative", zIndex: 1 }}>
+                      <circle cx="36" cy="38" r="28" fill="#16a34a" opacity=".9"/>
+                      <circle cx="36" cy="38" r="28" fill="none" stroke="rgba(255,255,255,0.25)" strokeWidth="2"/>
+                      {/* Segments */}
+                      <line x1="36" y1="10" x2="36" y2="66" stroke="rgba(255,255,255,0.2)" strokeWidth="1.5"/>
+                      <line x1="8" y1="38" x2="64" y2="38" stroke="rgba(255,255,255,0.2)" strokeWidth="1.5"/>
+                      <line x1="16" y1="18" x2="56" y2="58" stroke="rgba(255,255,255,0.15)" strokeWidth="1.5"/>
+                      <line x1="56" y1="18" x2="16" y2="58" stroke="rgba(255,255,255,0.15)" strokeWidth="1.5"/>
+                      {/* Stem */}
+                      <path d="M36 10 C36 10 40 4 46 6" stroke="#15803d" strokeWidth="2.5" strokeLinecap="round" fill="none"/>
+                      <ellipse cx="36" cy="38" rx="28" ry="28" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="1"/>
+                    </svg>
+                  )}
                 </div>
               </div>
             </div>
@@ -122,16 +149,16 @@ function CoinFlipGame() {
                     padding: "12px 32px", borderRadius: 12, fontSize: 13, fontWeight: 800,
                     letterSpacing: 2, textTransform: "uppercase", cursor: "pointer", transition: "all 0.2s",
                     background: side === s
-                      ? (s === "heads" ? "#10b981" : "#6b7280")
+                      ? (s === "heads" ? "#f59e0b" : "#22c55e")
                       : "rgba(255,255,255,0.04)",
-                    color: side === s ? "#fff" : "#4b5563",
+                    color: side === s ? "#000" : "#4b5563",
                     border: side === s
-                      ? (s === "heads" ? "1px solid #10b981" : "1px solid #6b7280")
+                      ? (s === "heads" ? "1px solid #f59e0b" : "1px solid #22c55e")
                       : "1px solid var(--border)",
-                    boxShadow: side === s ? (s === "heads" ? "0 0 20px rgba(16,185,129,0.5)" : "0 0 16px rgba(107,114,128,0.4)") : "none",
+                    boxShadow: side === s ? (s === "heads" ? "0 0 20px rgba(245,158,11,0.5)" : "0 0 16px rgba(34,197,94,0.4)") : "none",
                     opacity: spinning ? 0.5 : 1,
                   }}>
-                  {s === "heads" ? "◎ Heads" : "◌ Tails"}
+                  {s === "heads" ? "🟠 Heads" : "🟢 Tails"}
                 </button>
               ))}
             </div>
