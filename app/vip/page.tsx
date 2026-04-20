@@ -106,13 +106,13 @@ export default function VIPPage() {
   const currentTier = TIERS[userTierIdx];
 
   return (
-    <GameLayout title="VIP TIERS" accent={ACCENT} icon={<Crown size={18} />}>
+    <GameLayout title="REWARDS" accent={ACCENT} icon={<Crown size={18} />}>
       <div style={{ maxWidth: 860, margin: "0 auto" }}>
 
         {/* Header */}
         <div style={{ marginBottom: 28 }}>
           <h1 style={{ fontFamily: "var(--font-orbitron)", fontWeight: 900, fontSize: 22, color: "#fff", letterSpacing: 2, margin: 0 }}>
-            VIP PROGRAM
+            REWARDS
           </h1>
           <p style={{ color: "#4b5563", fontSize: 13, marginTop: 6 }}>
             Wager more, climb higher, unlock exclusive rewards.

@@ -2,7 +2,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
-import { Activity, Wallet, Trophy, Users, Zap, Bomb, Flame, TrendingUp } from "lucide-react";
+import { Activity, Wallet, Trophy, Users, Zap, Bomb, Flame, TrendingUp, Crown } from "lucide-react";
 import { WalletProvider, useWallet } from "./components/WalletContext";
 
 /* ─────────────────────────────── LOADING SCREEN ── */
@@ -311,6 +311,23 @@ function TopBar() {
             {jackpot.toLocaleString("en-US",{minimumFractionDigits:2})} ◎
           </div>
         </div>
+      </div>
+      <div style={{display:"flex",alignItems:"center",gap:8}}>
+        {[
+          {href:"/leaderboard",label:"Leaderboard",Icon:Trophy,color:"#f59e0b"},
+          {href:"/vip",        label:"Rewards",    Icon:Crown, color:"#a78bfa"},
+        ].map(({href,label,Icon,color})=>(
+          <Link key={href} href={href} style={{
+            textDecoration:"none",display:"flex",alignItems:"center",gap:6,
+            fontSize:12,fontWeight:600,padding:"6px 14px",borderRadius:100,
+            border:"1px solid var(--border)",color:"#4b5563",
+            transition:"all 0.15s ease-out",
+          }}
+          onMouseEnter={e=>{e.currentTarget.style.color=color;e.currentTarget.style.borderColor=`${color}40`;e.currentTarget.style.background=`${color}10`;}}
+          onMouseLeave={e=>{e.currentTarget.style.color="#4b5563";e.currentTarget.style.borderColor="var(--border)";e.currentTarget.style.background="transparent";}}>
+            <Icon size={12} strokeWidth={1.8}/>{label}
+          </Link>
+        ))}
       </div>
       <div style={{display:"flex",alignItems:"center",gap:10}}>
         <div style={{display:"flex",alignItems:"center",gap:8,background:"rgba(16,185,129,0.08)",border:"1px solid rgba(16,185,129,0.2)",borderRadius:100,padding:"8px 16px"}}>

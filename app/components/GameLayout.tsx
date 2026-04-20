@@ -1,6 +1,8 @@
 "use client";
 import { ReactNode } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { Trophy, Crown } from "lucide-react";
 import Sidebar from "./Sidebar";
 import { useWallet } from "./WalletContext";
 
@@ -11,8 +13,14 @@ interface Props {
   icon: ReactNode;
 }
 
+const NAV_LINKS = [
+  { href: "/leaderboard", label: "Leaderboard", Icon: Trophy, color: "#f59e0b" },
+  { href: "/vip",         label: "Rewards",     Icon: Crown,  color: "#a78bfa" },
+];
+
 function TopBar({ title, accent, icon }: { title: string; accent: string; icon: ReactNode }) {
   const { balance } = useWallet();
+  const pathname = usePathname();
   return (
     <div style={{
       position: "sticky", top: 0, zIndex: 40,
@@ -41,6 +49,30 @@ function TopBar({ title, accent, icon }: { title: string; accent: string; icon: 
           <span style={{ fontFamily: "var(--font-orbitron, monospace)", fontWeight: 900, fontSize: 14, letterSpacing: 2, color: "#fff" }}>{title}</span>
         </div>
       </div>
+
+      {/* Center nav */}
+      <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+        {NAV_LINKS.map(({ href, label, Icon, color }) => {
+          const active = pathname === href;
+          return (
+            <Link key={href} href={href} style={{
+              textDecoration: "none", display: "flex", alignItems: "center", gap: 6,
+              fontSize: 12, fontWeight: 600,
+              padding: "6px 14px", borderRadius: 100,
+              border: `1px solid ${active ? `${color}40` : "var(--border)"}`,
+              background: active ? `${color}12` : "transparent",
+              color: active ? color : "#4b5563",
+              transition: "all 0.15s ease-out",
+            }}
+            onMouseEnter={e => { if (!active) { e.currentTarget.style.color = "#9ca3af"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.15)"; }}}
+            onMouseLeave={e => { if (!active) { e.currentTarget.style.color = "#4b5563"; e.currentTarget.style.borderColor = "var(--border)"; }}}>
+              <Icon size={12} strokeWidth={active ? 2.5 : 1.8}/>
+              {label}
+            </Link>
+          );
+        })}
+      </div>
+
       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8, background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.2)", borderRadius: 10, padding: "7px 14px" }}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2"><path d="M20 12V8H6a2 2 0 01-2-2c0-1.1.9-2 2-2h12v4"/><path d="M4 6v12a2 2 0 002 2h14v-4"/><circle cx="18" cy="12" r="2"/></svg>
