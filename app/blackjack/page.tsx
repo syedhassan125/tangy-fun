@@ -142,7 +142,7 @@ function BlackjackGame() {
   async function resolveGame(finalPlayer: Card[], finalDealer: Card[], _: Card[], bet: number, playerBJ: boolean) {
     const pVal = fullHandValue(finalPlayer), dVal = fullHandValue(finalDealer);
     let outcome: GameResult["outcome"]; let payout = 0;
-    if (playerBJ && !isBlackjack(finalDealer)) { outcome = "blackjack"; payout = bet * 1.5; }
+    if (playerBJ && !isBlackjack(finalDealer)) { outcome = "blackjack"; payout = bet * 1.2; }
     else if (pVal > 21) { outcome = "loss"; }
     else if (dVal > 21 || pVal > dVal) { outcome = "win"; payout = bet; }
     else if (pVal === dVal) { outcome = "push"; payout = 0; }
@@ -315,10 +315,10 @@ function BlackjackGame() {
             <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: 3, textTransform: "uppercase", color: "#374151", marginBottom: 14 }}>Rules</div>
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {[
-                ["Blackjack pays", "3:2", "#10b981"],
-                ["Dealer stands", "Soft 17", "#fff"],
+                ["Blackjack pays", "6:5", "#10b981"],
+                ["Dealer stands", "Hard 17", "#fff"],
                 ["Double on", "Any 2 cards", "#fff"],
-                ["House edge", "~0.5%", "#a78bfa"],
+                ["House edge", "~5%", "#a78bfa"],
               ].map(([label, val, color]) => (
                 <div key={label as string} style={{ display: "flex", justifyContent: "space-between", fontSize: 12 }}>
                   <span style={{ color: "#4b5563" }}>{label}</span>
