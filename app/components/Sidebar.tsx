@@ -6,6 +6,7 @@ import Image from "next/image";
 import {
   Home, TrendingUp, Coins, Layers, Dices,
   Bomb, LayoutGrid, Timer, Clock, ArrowUpDown,
+  Trophy, Crown,
 } from "lucide-react";
 
 const BRAND = "#f59e0b";
@@ -63,6 +64,26 @@ export default function Sidebar() {
         } : {}}>
           <Home size={15} strokeWidth={pathname === "/" ? 2.5 : 1.8}/>
           <span>Home</span>
+        </Link>
+
+        <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: 3, textTransform: "uppercase", color: "#374151", padding: "10px 6px 8px" }}>REWARDS</div>
+
+        <Link href="/leaderboard" className="nav-item" style={pathname === "/leaderboard" ? {
+          background: `rgba(245,158,11,0.08)`, color: BRAND, border: `1px solid rgba(245,158,11,0.2)`
+        } : {}}>
+          <span style={{ color: BRAND, opacity: pathname === "/leaderboard" ? 1 : 0.65 }}>
+            <Trophy size={15} strokeWidth={pathname === "/leaderboard" ? 2.5 : 1.8}/>
+          </span>
+          <span>Leaderboard</span>
+        </Link>
+
+        <Link href="/vip" className="nav-item" style={pathname === "/vip" ? {
+          background: `rgba(167,139,250,0.08)`, color: "#a78bfa", border: `1px solid rgba(167,139,250,0.2)`
+        } : {}}>
+          <span style={{ color: "#a78bfa", opacity: pathname === "/vip" ? 1 : 0.65 }}>
+            <Crown size={15} strokeWidth={pathname === "/vip" ? 2.5 : 1.8}/>
+          </span>
+          <span>VIP</span>
         </Link>
 
         <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: 3, textTransform: "uppercase", color: "#374151", padding: "10px 6px 8px" }}>GAMES</div>
