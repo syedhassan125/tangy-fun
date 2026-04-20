@@ -40,7 +40,7 @@ const TIERS = [
     bg: "rgba(6,182,212,0.06)",
     border: "rgba(6,182,212,0.2)",
     glow: "rgba(6,182,212,0.12)",
-    perks: ["Everything in Citrus", "0.5% cashback on losses", "Exclusive game access", "Higher bet limits"],
+    perks: ["Everything in Citrus", "0.5% rake cashback on every bet", "Exclusive game access", "Higher bet limits"],
     Icon: Shield,
   },
   {
@@ -52,7 +52,7 @@ const TIERS = [
     bg: "rgba(245,158,11,0.07)",
     border: "rgba(245,158,11,0.25)",
     glow: "rgba(245,158,11,0.15)",
-    perks: ["Everything in Tropical", "1% cashback on losses", "Personal account manager", "VIP leaderboard position"],
+    perks: ["Everything in Tropical", "1% rake cashback on every bet", "Personal account manager", "VIP leaderboard position"],
     Icon: Crown,
   },
   {
@@ -64,7 +64,7 @@ const TIERS = [
     bg: "rgba(167,139,250,0.07)",
     border: "rgba(167,139,250,0.28)",
     glow: "rgba(167,139,250,0.18)",
-    perks: ["Everything in Elite", "2% cashback on all losses", "Custom bet limits", "Dedicated VIP host", "Exclusive Diamond events"],
+    perks: ["Everything in Elite", "2% rake cashback on every bet", "Custom bet limits", "Dedicated VIP host", "Exclusive Diamond events"],
     Icon: Gem,
   },
 ];
@@ -219,7 +219,22 @@ export default function VIPPage() {
           })}
         </div>
 
-        <p style={{ textAlign: "center", fontSize: 11, color: "#374151", marginTop: 24 }}>
+        {/* Cashback explainer */}
+        <div style={{
+          background: "rgba(245,158,11,0.03)", border: "1px solid rgba(245,158,11,0.1)",
+          borderRadius: 12, padding: "16px 20px", marginTop: 24,
+        }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: "#f59e0b", letterSpacing: 2, textTransform: "uppercase", marginBottom: 8 }}>
+            How Rake Cashback Works
+          </div>
+          <div style={{ fontSize: 12, color: "#4b5563", lineHeight: 1.7 }}>
+            Cashback is calculated on the <span style={{ color: "#9ca3af", fontWeight: 600 }}>house edge earned per bet</span>, not your total losses.
+            {" "}Example: you bet 100 SOL on a 5% house edge game — the house earns ~5 SOL. At Diamond tier (2% rake cashback) you receive <span style={{ color: "#a78bfa", fontWeight: 700 }}>0.10 SOL back</span>.
+            {" "}This keeps rewards sustainable as your volume grows.
+          </div>
+        </div>
+
+        <p style={{ textAlign: "center", fontSize: 11, color: "#374151", marginTop: 16 }}>
           Tier progress tracks lifetime wagered volume · Cashback activates at Tropical and above
         </p>
       </div>
