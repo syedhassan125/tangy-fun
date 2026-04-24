@@ -156,91 +156,153 @@ const Icons = {
 
 /* ─────────────────────────────── GAME DATA ── */
 const GAMES = [
-  { href:"/coinflip",  key:"coinflip",  label:"Coin Flip", desc:"Heads or tails · 1.96× payout",   accent:"#10b981", hot:false, players:31, maxMult:"1.96×",
-    bg:"linear-gradient(145deg,#001a0d,#002a18,#001208)",
-    art:<svg viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg" style={{width:"100%",height:"100%"}}>
-      <defs><radialGradient id="cg" cx="50%" cy="50%" r="50%"><stop offset="0%" stopColor="#10b981" stopOpacity=".28"/><stop offset="100%" stopColor="#10b981" stopOpacity="0"/></radialGradient></defs>
-      <circle cx="100" cy="60" r="52" fill="url(#cg)"/>
-      <circle cx="100" cy="60" r="40" stroke="#10b981" strokeWidth="1.5" strokeOpacity=".45"/>
-      <circle cx="100" cy="60" r="30" stroke="#34d399" strokeWidth="1" strokeDasharray="5 3" strokeOpacity=".6"/>
-      <text x="100" y="70" textAnchor="middle" fill="#10b981" fontSize="30" fontFamily="monospace" fontWeight="bold" opacity=".9">◎</text>
+  { href:"/coinflip", key:"coinflip", label:"Coin Flip", desc:"Heads or tails — instant result", accent:"#10b981", hot:false, players:31, maxMult:"1.95×", badge:"",
+    bg:"linear-gradient(160deg,#001a0d 0%,#003020 50%,#001a0d 100%)",
+    art:<svg viewBox="0 0 240 200" fill="none" xmlns="http://www.w3.org/2000/svg" style={{width:"100%",height:"100%",position:"absolute",inset:0}}>
+      <defs>
+        <radialGradient id="cf-bg" cx="50%" cy="50%" r="60%"><stop offset="0%" stopColor="#10b981" stopOpacity=".15"/><stop offset="100%" stopColor="#10b981" stopOpacity="0"/></radialGradient>
+        <radialGradient id="cf-coin" cx="38%" cy="32%" r="60%"><stop offset="0%" stopColor="#fde68a"/><stop offset="40%" stopColor="#f59e0b"/><stop offset="100%" stopColor="#78350f"/></radialGradient>
+        <filter id="cf-glow"><feGaussianBlur stdDeviation="4" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+      </defs>
+      <circle cx="120" cy="100" r="90" fill="url(#cf-bg)"/>
+      <ellipse cx="120" cy="108" rx="52" ry="10" fill="rgba(0,0,0,0.4)" filter="url(cf-glow)"/>
+      <circle cx="120" cy="90" r="52" fill="url(#cf-coin)" filter="url(#cf-glow)"/>
+      <circle cx="120" cy="90" r="44" fill="none" stroke="rgba(253,230,138,0.4)" strokeWidth="2"/>
+      <circle cx="120" cy="90" r="36" fill="none" stroke="rgba(253,230,138,0.2)" strokeWidth="1" strokeDasharray="6 3"/>
+      <text x="120" y="100" textAnchor="middle" fill="rgba(120,53,15,0.9)" fontSize="28" fontFamily="monospace" fontWeight="bold">◎</text>
+      <path d="M95 60 Q120 50 145 60" stroke="rgba(253,230,138,0.5)" strokeWidth="2" fill="none" strokeLinecap="round"/>
+      <circle cx="107" cy="68" r="3" fill="rgba(253,230,138,0.6)"/>
+      {[0,60,120,180,240,300].map(a=>{const r=62,x=120+r*Math.cos(a*Math.PI/180),y=90+r*Math.sin(a*Math.PI/180);return<circle key={a} cx={x} cy={y} r="2" fill="#10b981" opacity=".4"/>;})}
     </svg>,
   },
-  { href:"/blackjack", key:"blackjack", label:"Blackjack", desc:"Beat the dealer · 3:2 blackjack",  accent:"#ef4444", hot:false, players:24, maxMult:"3:2",
-    bg:"linear-gradient(145deg,#1a0005,#2a0010,#120003)",
-    art:<svg viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg" style={{width:"100%",height:"100%"}}>
-      <rect x="62" y="14" width="52" height="76" rx="7" fill="#12000a" stroke="#ef4444" strokeWidth="1.5" strokeOpacity=".5"/>
-      <rect x="86" y="24" width="52" height="76" rx="7" fill="#0c0005" stroke="#ef4444" strokeWidth="1.5" strokeOpacity=".85"/>
-      <text x="90" y="75" textAnchor="middle" fill="#ef4444" fontSize="30" fontFamily="serif" opacity=".9">♠</text>
-      <text x="91" y="42" textAnchor="middle" fill="#ef4444" fontSize="13" fontFamily="monospace" fontWeight="bold" opacity=".9">A</text>
-      <text x="132" y="93" textAnchor="middle" fill="#ef4444" fontSize="13" fontFamily="monospace" fontWeight="bold" opacity=".45" transform="rotate(180,132,93)">A</text>
+  { href:"/blackjack", key:"blackjack", label:"Blackjack", desc:"Beat the dealer — 3:2 on blackjack", accent:"#ef4444", hot:false, players:24, maxMult:"3:2", badge:"",
+    bg:"linear-gradient(160deg,#0a0002 0%,#1a0008 50%,#0a0002 100%)",
+    art:<svg viewBox="0 0 240 200" fill="none" xmlns="http://www.w3.org/2000/svg" style={{width:"100%",height:"100%",position:"absolute",inset:0}}>
+      <defs><filter id="bj-shadow"><feDropShadow dx="4" dy="8" stdDeviation="6" floodColor="#000" floodOpacity=".7"/></filter></defs>
+      <rect x="30" y="20" width="110" height="155" rx="10" fill="#0d0005" stroke="rgba(239,68,68,0.2)" strokeWidth="1" filter="url(#bj-shadow)" transform="rotate(-8 85 97)"/>
+      <rect x="30" y="20" width="110" height="155" rx="10" fill="#f8f0f5" stroke="rgba(180,0,30,0.3)" strokeWidth="1" filter="url(#bj-shadow)" transform="rotate(-8 85 97)"/>
+      <text x="46" y="50" fill="#c00020" fontSize="18" fontFamily="Georgia,serif" fontWeight="bold" transform="rotate(-8 46 50)">A</text>
+      <text x="46" y="68" fill="#c00020" fontSize="14" fontFamily="Georgia,serif" transform="rotate(-8 46 68)">♠</text>
+      <rect x="100" y="30" width="110" height="155" rx="10" fill="#fff" stroke="rgba(180,0,30,0.25)" strokeWidth="1" filter="url(#bj-shadow)" transform="rotate(5 155 107)"/>
+      <text x="110" y="80" fill="#c00020" fontSize="20" fontFamily="Georgia,serif" fontWeight="bold" transform="rotate(5 110 80)">K</text>
+      <text x="110" y="100" fill="#c00020" fontSize="15" fontFamily="Georgia,serif" transform="rotate(5 110 100)">♥</text>
+      <text x="152" y="172" fill="#c00020" fontSize="20" fontFamily="Georgia,serif" fontWeight="bold" transform="rotate(185 152 172)">K</text>
+      <rect x="80" y="168" width="80" height="24" rx="12" fill="rgba(239,68,68,0.1)" stroke="rgba(239,68,68,0.4)" strokeWidth="1"/>
+      <text x="120" y="184" textAnchor="middle" fontSize="10" fontFamily="monospace" fontWeight="bold" fill="#ef4444" opacity=".9">BLACKJACK!</text>
     </svg>,
   },
-  { href:"/dice",      key:"dice",      label:"Dice",      desc:"Roll over or under your target",   accent:"#06b6d4", hot:false, players:19, maxMult:"98×",
-    bg:"linear-gradient(145deg,#00111a,#001e2d,#000f18)",
-    art:<svg viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg" style={{width:"100%",height:"100%"}}>
-      <defs><linearGradient id="dt" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stopColor="#ef4444" stopOpacity=".75"/><stop offset="44%" stopColor="#ef4444" stopOpacity=".75"/><stop offset="44%" stopColor="#06b6d4" stopOpacity=".75"/><stop offset="100%" stopColor="#06b6d4" stopOpacity=".75"/></linearGradient></defs>
-      <rect x="20" y="54" width="160" height="7" rx="3.5" fill="rgba(255,255,255,0.05)"/>
-      <rect x="20" y="54" width="160" height="7" rx="3.5" fill="url(#dt)"/>
-      <rect x="107" y="50" width="2" height="15" rx="1" fill="#fff" opacity=".8"/>
-      <rect x="73" y="14" width="54" height="42" rx="9" fill="#0a1e28" stroke="#06b6d4" strokeWidth="1.5" strokeOpacity=".65"/>
-      <circle cx="88" cy="27" r="3.5" fill="#06b6d4" opacity=".9"/><circle cx="112" cy="27" r="3.5" fill="#06b6d4" opacity=".9"/><circle cx="100" cy="35" r="3.5" fill="#06b6d4" opacity=".9"/>
+  { href:"/dice", key:"dice", label:"Dice", desc:"Roll over or under — up to 98× multiplier", accent:"#06b6d4", hot:false, players:19, maxMult:"98×", badge:"",
+    bg:"linear-gradient(160deg,#00111a 0%,#002030 50%,#00111a 100%)",
+    art:<svg viewBox="0 0 240 200" fill="none" xmlns="http://www.w3.org/2000/svg" style={{width:"100%",height:"100%",position:"absolute",inset:0}}>
+      <defs>
+        <linearGradient id="dice-face" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="#0e3a4a"/><stop offset="100%" stopColor="#051820"/></linearGradient>
+        <linearGradient id="dice-top" x1="0" y1="1" x2="1" y2="0"><stop offset="0%" stopColor="#1a5a70"/><stop offset="100%" stopColor="#0e3a4a"/></linearGradient>
+        <linearGradient id="dice-side" x1="1" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#0a2a38"/><stop offset="100%" stopColor="#051820"/></linearGradient>
+        <filter id="dice-glow"><feDropShadow dx="0" dy="0" stdDeviation="8" floodColor="#06b6d4" floodOpacity=".5"/></filter>
+      </defs>
+      <g filter="url(#dice-glow)" transform="translate(50,20)">
+        <path d="M70 0L140 35V105L70 140L0 105V35L70 0Z" fill="url(#dice-face)" stroke="#06b6d4" strokeWidth="1.5" strokeOpacity=".7"/>
+        <path d="M70 0L140 35L110 52L40 17L70 0Z" fill="url(#dice-top)" stroke="#06b6d4" strokeWidth="1" strokeOpacity=".5"/>
+        <path d="M140 35L140 105L110 122L110 52L140 35Z" fill="url(#dice-side)" stroke="#06b6d4" strokeWidth="1" strokeOpacity=".4"/>
+        {[[50,55],[50,80],[50,105],[90,55],[90,80],[90,105]].map(([cx,cy],i)=>(
+          <circle key={i} cx={cx} cy={cy} r="7" fill="#06b6d4" opacity=".9"/>
+        ))}
+      </g>
+      <rect x="20" y="158" width="200" height="8" rx="4" fill="rgba(255,255,255,0.04)"/>
+      <rect x="20" y="158" width="88" height="8" rx="4" fill="rgba(239,68,68,0.6)"/>
+      <rect x="108" y="158" width="112" height="8" rx="4" fill="rgba(6,182,212,0.6)"/>
+      <circle cx="108" cy="162" r="6" fill="#fff" stroke="#06b6d4" strokeWidth="2"/>
+      <text x="120" y="183" textAnchor="middle" fontSize="10" fill="#06b6d4" fontFamily="monospace" fontWeight="bold" opacity=".8">ROLL OVER 44 → WIN 2.14×</text>
     </svg>,
   },
-  { href:"/mines",     key:"mines",     label:"Mines",     desc:"Reveal tiles · avoid the bombs",   accent:"#a855f7", hot:true,  players:38, maxMult:"24×",
-    bg:"linear-gradient(145deg,#0d0020,#18003a,#0a0018)",
-    art:<svg viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg" style={{width:"100%",height:"100%"}}>
-      {[0,1,2,3,4].map(col=>[0,1,2].map(row=>{
-        const x=30+col*30,y=15+row*30,isMine=(col===2&&row===1)||(col===4&&row===0),isRev=col<2||(col===2&&row===0);
-        return(<g key={`${col}-${row}`}><rect x={x} y={y} width="24" height="24" rx="4" fill={isMine?"rgba(168,85,247,0.12)":isRev?"rgba(168,85,247,0.22)":"rgba(255,255,255,0.03)"} stroke={isRev?"rgba(168,85,247,0.55)":"rgba(255,255,255,0.07)"} strokeWidth="1"/>{isMine&&<><circle cx={x+12} cy={y+13} r="5" fill="#a855f7" opacity=".85"/><line x1={x+12} y1={y+7} x2={x+12} y2={y+5} stroke="#a855f7" strokeWidth="1.5" strokeLinecap="round"/><line x1={x+15} y1={y+8} x2={x+17} y2={y+6} stroke="#a855f7" strokeWidth="1.2" strokeLinecap="round"/></>}{isRev&&!isMine&&<text x={x+12} y={y+17} textAnchor="middle" fontSize="11" fill="#a855f7" fontFamily="monospace" fontWeight="bold" opacity=".9">✓</text>}</g>);
+  { href:"/mines", key:"mines", label:"Mines", desc:"Reveal gems — dodge the bombs", accent:"#a855f7", hot:true, players:38, maxMult:"24×", badge:"HOT",
+    bg:"linear-gradient(160deg,#0d0020 0%,#1a003a 50%,#0d0020 100%)",
+    art:<svg viewBox="0 0 240 200" fill="none" xmlns="http://www.w3.org/2000/svg" style={{width:"100%",height:"100%",position:"absolute",inset:0}}>
+      <defs>
+        <radialGradient id="mine-bg" cx="50%" cy="50%" r="60%"><stop offset="0%" stopColor="#a855f7" stopOpacity=".12"/><stop offset="100%" stopColor="#a855f7" stopOpacity="0"/></radialGradient>
+        <filter id="gem-glow"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        <filter id="bomb-glow"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+      </defs>
+      <circle cx="120" cy="100" r="90" fill="url(#mine-bg)"/>
+      {[0,1,2,3,4].map(col=>[0,1,2,3].map(row=>{
+        const x=22+col*44,y=18+row*44;
+        const isExplode=col===3&&row===1,isGem=(col+row)%3===0&&!isExplode,isHidden=!isGem&&!isExplode;
+        return(<g key={`${col}-${row}`}>
+          <rect x={x} y={y} width="36" height="36" rx="7"
+            fill={isExplode?"rgba(239,68,68,0.15)":isGem?"rgba(168,85,247,0.2)":"rgba(255,255,255,0.03)"}
+            stroke={isExplode?"rgba(239,68,68,0.8)":isGem?"rgba(168,85,247,0.6)":"rgba(255,255,255,0.06)"}
+            strokeWidth={isExplode||isGem?1.5:1}/>
+          {isGem&&<g filter="url(#gem-glow)">
+            <polygon points={`${x+18},${y+8} ${x+28},${y+18} ${x+18},${y+28} ${x+8},${y+18}`} fill="#a855f7" opacity=".9"/>
+            <polygon points={`${x+18},${y+8} ${x+28},${y+18} ${x+18},${y+18}`} fill="rgba(255,255,255,0.35)"/>
+          </g>}
+          {isExplode&&<g filter="url(#bomb-glow)">
+            <circle cx={x+18} cy={y+20} r="9" fill="#ef4444" opacity=".9"/>
+            <line x1={x+18} y1={y+10} x2={x+18} y2={y+7} stroke="#ef4444" strokeWidth="2" strokeLinecap="round"/>
+            <line x1={x+24} y1={y+12} x2={x+27} y2={y+9} stroke="#ef4444" strokeWidth="1.5" strokeLinecap="round"/>
+            <line x1={x+12} y1={y+12} x2={x+9} y2={y+9} stroke="#ef4444" strokeWidth="1.5" strokeLinecap="round"/>
+            {[0,45,90,135,180,225,270,315].map(a=>{const r=16,bx=x+18+r*Math.cos(a*Math.PI/180),by=y+20+r*Math.sin(a*Math.PI/180);return<circle key={a} cx={bx} cy={by} r="2" fill="#f97316" opacity=".8"/>;})}
+          </g>}
+        </g>);
       }))}
     </svg>,
   },
-  { href:"/keno",      key:"keno",      label:"Keno",      desc:"Pick numbers · up to 5000× payout",  accent:"#f59e0b", hot:true,  players:52, maxMult:"5000×",
-    bg:"linear-gradient(145deg,#110d00,#1c1500,#0f0b00)",
-    art:<svg viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg" style={{width:"100%",height:"100%"}}>
-      <defs><radialGradient id="kg" cx="50%" cy="50%" r="50%"><stop offset="0%" stopColor="#f59e0b" stopOpacity=".2"/><stop offset="100%" stopColor="#f59e0b" stopOpacity="0"/></radialGradient></defs>
-      <circle cx="100" cy="60" r="55" fill="url(#kg)"/>
-      {[0,1,2,3,4,5,6,7].map(col=>[0,1,2].map(row=>{
-        const x=18+col*22,y=12+row*34,isHit=(col===1&&row===0)||(col===3&&row===1)||(col===5&&row===2)||(col===7&&row===0)||(col===2&&row===2);
-        return(<g key={`${col}-${row}`}><circle cx={x+9} cy={y+9} r="9" fill={isHit?"rgba(245,158,11,0.25)":"rgba(255,255,255,0.03)"} stroke={isHit?"rgba(245,158,11,0.7)":"rgba(255,255,255,0.07)"} strokeWidth="1"/>{isHit&&<circle cx={x+9} cy={y+9} r="5" fill="#f59e0b" opacity=".8" style={{filter:"drop-shadow(0 0 4px #f59e0b)"}}/>}</g>);
-      }))}
+  { href:"/keno", key:"keno", label:"Keno", desc:"Pick your numbers — massive multipliers", accent:"#f59e0b", hot:true, players:52, maxMult:"180×", badge:"HOT",
+    bg:"linear-gradient(160deg,#110d00 0%,#201500 50%,#110d00 100%)",
+    art:<svg viewBox="0 0 240 200" fill="none" xmlns="http://www.w3.org/2000/svg" style={{width:"100%",height:"100%",position:"absolute",inset:0}}>
+      <defs>
+        <radialGradient id="kn-bg" cx="50%" cy="50%" r="60%"><stop offset="0%" stopColor="#f59e0b" stopOpacity=".14"/><stop offset="100%" stopColor="#f59e0b" stopOpacity="0"/></radialGradient>
+        <radialGradient id="kn-ball" cx="35%" cy="30%" r="60%"><stop offset="0%" stopColor="#fde68a"/><stop offset="50%" stopColor="#f59e0b"/><stop offset="100%" stopColor="#78350f"/></radialGradient>
+        <filter id="kn-glow"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+      </defs>
+      <circle cx="120" cy="100" r="90" fill="url(#kn-bg)"/>
+      {[{n:7,x:50,y:45,hit:true},{n:14,x:95,y:30,hit:false},{n:22,x:145,y:45,hit:true},{n:31,x:175,y:80,hit:false},{n:3,x:30,y:95,hit:false},{n:19,x:80,y:110,hit:true},{n:27,x:130,y:100,hit:false},{n:35,x:170,y:130,hit:true},{n:11,x:55,y:150,hit:false},{n:40,x:110,y:155,hit:true}].map(({n,x,y,hit})=>(
+        <g key={n} filter={hit?"url(#kn-glow)":undefined}>
+          <circle cx={x} cy={y} r={hit?19:15} fill={hit?"url(#kn-ball)":"rgba(255,255,255,0.05)"} stroke={hit?"rgba(253,230,138,0.6)":"rgba(255,255,255,0.08)"} strokeWidth={hit?1.5:1}/>
+          {hit&&<circle cx={x-5} cy={y-6} r="5" fill="rgba(255,255,255,0.25)"/>}
+          <text x={x} y={y+4} textAnchor="middle" fontSize={hit?11:9} fontFamily="monospace" fontWeight="bold" fill={hit?"rgba(120,53,15,0.95)":"rgba(255,255,255,0.3)"}>{n}</text>
+        </g>
+      ))}
     </svg>,
   },
-  { href:"/hilo",      key:"hilo",      label:"Hi-Lo",         desc:"Guess higher or lower · compound multiplier", accent:"#ec4899", hot:true,  players:44, maxMult:"∞×",
-    bg:"linear-gradient(145deg,#12001a,#1e0030,#0a0012)",
-    art:<svg viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg" style={{width:"100%",height:"100%"}}>
-      <defs><radialGradient id="hg" cx="50%" cy="50%" r="50%"><stop offset="0%" stopColor="#ec4899" stopOpacity=".2"/><stop offset="100%" stopColor="#ec4899" stopOpacity="0"/></radialGradient></defs>
-      <circle cx="100" cy="60" r="55" fill="url(#hg)"/>
-      {/* Center card */}
-      <rect x="78" y="22" width="44" height="60" rx="5" fill="#fff" stroke="rgba(220,38,38,0.45)" strokeWidth="1.5"/>
-      <text x="100" y="52" textAnchor="middle" fill="#dc2626" fontSize="16" fontFamily="serif" fontWeight="bold" opacity=".95">A</text>
-      <text x="100" y="66" textAnchor="middle" fill="#dc2626" fontSize="12" fontFamily="serif" opacity=".85">♥</text>
-      {/* HI arrow */}
-      <path d="M100 16l6 8H94l6-8z" fill="#ec4899" opacity=".85" style={{filter:"drop-shadow(0 0 6px #ec4899)"}}/>
-      {/* LO arrow */}
-      <path d="M100 88l6-8H94l6 8z" fill="#ec4899" opacity=".85" style={{filter:"drop-shadow(0 0 6px #ec4899)"}}/>
-      {/* Multiplier text */}
-      <text x="100" y="106" textAnchor="middle" fontSize="9" fontFamily="monospace" fontWeight="bold" fill="#ec4899" opacity=".8">12.48× · COMPOUND</text>
+  { href:"/hilo", key:"hilo", label:"Hi-Lo", desc:"Higher or lower — compound your winnings", accent:"#ec4899", hot:true, players:44, maxMult:"∞×", badge:"HOT",
+    bg:"linear-gradient(160deg,#12001a 0%,#22003a 50%,#12001a 100%)",
+    art:<svg viewBox="0 0 240 200" fill="none" xmlns="http://www.w3.org/2000/svg" style={{width:"100%",height:"100%",position:"absolute",inset:0}}>
+      <defs>
+        <radialGradient id="hl-bg" cx="50%" cy="50%" r="60%"><stop offset="0%" stopColor="#ec4899" stopOpacity=".15"/><stop offset="100%" stopColor="#ec4899" stopOpacity="0"/></radialGradient>
+        <filter id="hl-arrow"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+      </defs>
+      <circle cx="120" cy="100" r="90" fill="url(#hl-bg)"/>
+      <rect x="65" y="30" width="50" height="70" rx="6" fill="#fff" stroke="rgba(180,0,60,0.3)" strokeWidth="1" opacity=".25" transform="rotate(-10 90 65)"/>
+      <rect x="125" y="30" width="50" height="70" rx="6" fill="#fff" stroke="rgba(180,0,60,0.3)" strokeWidth="1" opacity=".25" transform="rotate(10 150 65)"/>
+      <rect x="88" y="48" width="64" height="90" rx="8" fill="#fff" stroke="rgba(180,0,60,0.2)" strokeWidth="1.5"/>
+      <text x="120" y="88" textAnchor="middle" fill="#b91c1c" fontSize="26" fontFamily="Georgia,serif" fontWeight="bold">A</text>
+      <text x="120" y="108" textAnchor="middle" fill="#b91c1c" fontSize="20" fontFamily="Georgia,serif">♥</text>
+      <text x="96" y="63" fill="#b91c1c" fontSize="11" fontFamily="Georgia,serif" fontWeight="bold">A</text>
+      <path d="M120 30 L132 48 L108 48 Z" fill="#10b981" filter="url(#hl-arrow)" opacity=".95"/>
+      <path d="M120 158 L132 140 L108 140 Z" fill="#ef4444" filter="url(#hl-arrow)" opacity=".95"/>
+      <rect x="70" y="163" width="100" height="22" rx="11" fill="rgba(236,72,153,0.1)" stroke="rgba(236,72,153,0.4)" strokeWidth="1"/>
+      <text x="120" y="178" textAnchor="middle" fontSize="10" fontFamily="monospace" fontWeight="bold" fill="#ec4899">12.48× MULTIPLIER</text>
     </svg>,
   },
-  { href:"/lastbet",   key:"lastbet",   label:"Last Bet Wins", desc:"Last to bet before timer wins the pot", accent:"#f97316", hot:true,  players:89, maxMult:"∞×",
-    bg:"linear-gradient(145deg,#1a0800,#2a0f00,#160700)",
-    art:<svg viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg" style={{width:"100%",height:"100%"}}>
-      <defs><radialGradient id="lg" cx="50%" cy="50%" r="50%"><stop offset="0%" stopColor="#f97316" stopOpacity=".18"/><stop offset="100%" stopColor="#f97316" stopOpacity="0"/></radialGradient></defs>
-      <circle cx="100" cy="60" r="55" fill="url(#lg)"/>
-      {/* Clock ring */}
-      <circle cx="100" cy="60" r="45" stroke="#f97316" strokeWidth="2" strokeOpacity=".25" fill="none"/>
-      <circle cx="100" cy="60" r="45" stroke="#f97316" strokeWidth="2.5" strokeOpacity=".9" fill="none"
-        strokeDasharray="212" strokeDashoffset="80" strokeLinecap="round"
-        transform="rotate(-90 100 60)" style={{filter:"drop-shadow(0 0 6px #f97316)"}}/>
-      {/* Clock hands */}
-      <line x1="100" y1="60" x2="100" y2="24" stroke="#f97316" strokeWidth="2.5" strokeLinecap="round" strokeOpacity=".9"/>
-      <line x1="100" y1="60" x2="124" y2="72" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeOpacity=".6"/>
-      <circle cx="100" cy="60" r="4" fill="#f97316"/>
-      {/* Jackpot badge */}
-      <rect x="60" y="88" width="80" height="22" rx="11" fill="rgba(245,197,24,0.12)" stroke="rgba(245,197,24,0.35)" strokeWidth="1"/>
-      <text x="100" y="103" textAnchor="middle" fontSize="10" fontFamily="monospace" fontWeight="bold" fill="#f5c518" opacity=".9">JACKPOT LIVE</text>
+  { href:"/lastbet", key:"lastbet", label:"Last Bet Wins", desc:"Last bettor when timer hits zero wins the pot", accent:"#f97316", hot:true, players:89, maxMult:"∞×", badge:"LIVE",
+    bg:"linear-gradient(160deg,#1a0800 0%,#2e1200 50%,#1a0800 100%)",
+    art:<svg viewBox="0 0 240 200" fill="none" xmlns="http://www.w3.org/2000/svg" style={{width:"100%",height:"100%",position:"absolute",inset:0}}>
+      <defs>
+        <radialGradient id="lb-bg" cx="50%" cy="50%" r="60%"><stop offset="0%" stopColor="#f97316" stopOpacity=".18"/><stop offset="100%" stopColor="#f97316" stopOpacity="0"/></radialGradient>
+        <filter id="lb-glow"><feGaussianBlur stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+      </defs>
+      <circle cx="120" cy="95" r="90" fill="url(#lb-bg)"/>
+      <circle cx="120" cy="95" r="70" stroke="rgba(249,115,22,0.12)" strokeWidth="12" fill="none"/>
+      <circle cx="120" cy="95" r="70" stroke="#f97316" strokeWidth="6" fill="none"
+        strokeDasharray="440" strokeDashoffset="350" strokeLinecap="round"
+        transform="rotate(-90 120 95)" filter="url(#lb-glow)"/>
+      <circle cx="120" cy="95" r="52" fill="rgba(0,0,0,0.4)" stroke="rgba(249,115,22,0.2)" strokeWidth="1"/>
+      <text x="120" y="88" textAnchor="middle" fontFamily="monospace" fontWeight="900" fontSize="36" fill="#fff">07</text>
+      <text x="120" y="106" textAnchor="middle" fontSize="9" fill="#4b5563" letterSpacing="3" fontFamily="monospace">SECONDS</text>
+      <rect x="58" y="150" width="124" height="30" rx="15" fill="rgba(245,197,24,0.1)" stroke="rgba(245,197,24,0.4)" strokeWidth="1.5"/>
+      <circle cx="75" cy="165" r="5" fill="#f5c518" opacity=".8"/>
+      <text x="120" y="170" textAnchor="middle" fontSize="11" fontFamily="monospace" fontWeight="bold" fill="#f5c518">POT: 42.75 ◎</text>
     </svg>,
   },
 ];
@@ -342,44 +404,62 @@ function TopBar() {
 
 /* ─────────────────────────────── HERO ── */
 function HeroBanner() {
+  const [jackpot,setJackpot]=useState(84291.47);
+  useEffect(()=>{const t=setInterval(()=>setJackpot(v=>parseFloat((v+Math.random()*.8+.1).toFixed(2))),280);return()=>clearInterval(t);},[]);
   return(
-    <div style={{position:"relative",borderRadius:22,overflow:"hidden",height:230,background:"linear-gradient(135deg,#100900 0%,#1a1000 45%,#0e0c18 100%)",border:"1px solid rgba(245,158,11,0.2)",boxShadow:"0 0 0 1px rgba(245,158,11,0.06), 0 20px 80px rgba(0,0,0,0.5)"}}>
-      {/* Subtle grid */}
-      <div style={{position:"absolute",inset:0,backgroundImage:"linear-gradient(rgba(245,158,11,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(245,158,11,0.03) 1px,transparent 1px)",backgroundSize:"50px 50px"}}/>
+    <div style={{position:"relative",borderRadius:24,overflow:"hidden",height:320,background:"linear-gradient(135deg,#100900 0%,#1e1200 40%,#0e0c18 100%)",border:"1px solid rgba(245,158,11,0.2)",boxShadow:"0 0 0 1px rgba(245,158,11,0.06), 0 24px 80px rgba(0,0,0,0.6)"}}>
+      {/* Grid */}
+      <div style={{position:"absolute",inset:0,backgroundImage:"linear-gradient(rgba(245,158,11,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(245,158,11,0.025) 1px,transparent 1px)",backgroundSize:"48px 48px"}}/>
       {/* Glow orbs */}
-      <div style={{position:"absolute",top:-60,left:"15%",width:340,height:340,borderRadius:"50%",background:"radial-gradient(circle,rgba(245,158,11,0.14) 0%,transparent 70%)",filter:"blur(55px)"}}/>
-      <div style={{position:"absolute",bottom:-40,right:"20%",width:220,height:220,borderRadius:"50%",background:"radial-gradient(circle,rgba(245,158,11,0.07) 0%,transparent 70%)",filter:"blur(60px)"}}/>
+      <div style={{position:"absolute",top:-80,left:"10%",width:420,height:420,borderRadius:"50%",background:"radial-gradient(circle,rgba(245,158,11,0.16) 0%,transparent 70%)",filter:"blur(60px)",pointerEvents:"none"}}/>
+      <div style={{position:"absolute",bottom:-60,right:"15%",width:300,height:300,borderRadius:"50%",background:"radial-gradient(circle,rgba(167,139,250,0.08) 0%,transparent 70%)",filter:"blur(70px)",pointerEvents:"none"}}/>
+      <div style={{position:"absolute",top:"30%",right:"30%",width:200,height:200,borderRadius:"50%",background:"radial-gradient(circle,rgba(245,158,11,0.05) 0%,transparent 70%)",filter:"blur(40px)",pointerEvents:"none"}}/>
 
-      {/* Content */}
-      <div style={{position:"relative",zIndex:2,height:"100%",display:"flex",flexDirection:"column",justifyContent:"center",padding:"0 44px"}}>
-        <div className="live-badge" style={{marginBottom:16,width:"fit-content"}}><span className="live-dot"/>LIVE · SOLANA · NO KYC · INSTANT</div>
-        <h1 style={{fontFamily:"var(--font-orbitron)",fontWeight:900,fontSize:"clamp(2rem,4vw,3.2rem)",lineHeight:1.1,marginBottom:12,letterSpacing:3}}>
-          <span style={{color:"#f59e0b",textShadow:"0 0 40px rgba(245,158,11,0.55), 0 0 80px rgba(245,158,11,0.25)"}}>TANGY</span>
+      {/* Left content */}
+      <div style={{position:"relative",zIndex:2,height:"100%",display:"flex",flexDirection:"column",justifyContent:"center",padding:"0 52px",maxWidth:560}}>
+        <div className="live-badge" style={{marginBottom:20,width:"fit-content"}}><span className="live-dot"/>LIVE · SOLANA · NO KYC · INSTANT PAYOUTS</div>
+        <h1 style={{fontFamily:"var(--font-orbitron)",fontWeight:900,fontSize:"clamp(2.4rem,4.5vw,3.8rem)",lineHeight:1.05,marginBottom:8,letterSpacing:2}}>
+          <span style={{color:"#f59e0b",textShadow:"0 0 40px rgba(245,158,11,0.7), 0 0 80px rgba(245,158,11,0.3)"}}>TANGY</span>
           <span style={{color:"#fff"}}>.FUN</span>
         </h1>
-        <p style={{color:"#6b7280",fontSize:13,marginBottom:22}}>6 provably fair games · 2% house edge · win instantly on Solana</p>
-        <div style={{display:"flex",gap:10}}>
-          <Link href="/lastbet" style={{textDecoration:"none",display:"inline-flex",alignItems:"center",gap:8,background:"linear-gradient(135deg,#f59e0b,#d97706)",color:"#0a1a00",fontFamily:"var(--font-orbitron)",fontWeight:900,fontSize:12,letterSpacing:2,padding:"11px 22px",borderRadius:100,border:"none",boxShadow:"0 4px 20px rgba(245,158,11,0.35)"}}>
-            <Zap size={14} strokeWidth={2.5}/> Last Bet Wins
+        <p style={{color:"#6b7280",fontSize:13,marginBottom:10,lineHeight:1.6}}>7 provably fair games · instant Solana payouts · no KYC required</p>
+
+        {/* Live jackpot counter */}
+        <div style={{display:"inline-flex",alignItems:"center",gap:10,background:"rgba(245,158,11,0.06)",border:"1px solid rgba(245,158,11,0.2)",borderRadius:12,padding:"10px 16px",marginBottom:24,width:"fit-content"}}>
+          <div style={{width:8,height:8,borderRadius:"50%",background:"#f59e0b",boxShadow:"0 0 8px #f59e0b",animation:"live-pulse 1.6s ease-in-out infinite"}}/>
+          <span style={{fontSize:10,color:"#6b7280",letterSpacing:2,textTransform:"uppercase"}}>Live Jackpot</span>
+          <span style={{fontFamily:"var(--font-orbitron)",fontWeight:900,fontSize:16,color:"#f59e0b",textShadow:"0 0 16px rgba(245,158,11,0.5)",letterSpacing:1}}>{jackpot.toLocaleString("en-US",{minimumFractionDigits:2})} ◎</span>
+        </div>
+
+        <div style={{display:"flex",gap:10,flexWrap:"wrap"}}>
+          <Link href="/lastbet" style={{textDecoration:"none",display:"inline-flex",alignItems:"center",gap:8,background:"linear-gradient(135deg,#f59e0b,#d97706)",color:"#0a1a00",fontFamily:"var(--font-orbitron)",fontWeight:900,fontSize:11,letterSpacing:2,padding:"12px 24px",borderRadius:100,boxShadow:"0 4px 24px rgba(245,158,11,0.45)"}}>
+            <Zap size={13} strokeWidth={2.5}/> LAST BET WINS
           </Link>
-          <Link href="/mines" style={{textDecoration:"none",display:"inline-flex",alignItems:"center",gap:8,background:"rgba(255,255,255,0.05)",color:"#9ca3af",fontFamily:"var(--font-orbitron)",fontWeight:700,fontSize:12,letterSpacing:2,padding:"11px 22px",borderRadius:100,border:"1px solid rgba(255,255,255,0.1)"}}>
-            <Bomb size={14} strokeWidth={1.8}/> Play Mines
+          <Link href="/mines" style={{textDecoration:"none",display:"inline-flex",alignItems:"center",gap:8,background:"rgba(168,85,247,0.08)",color:"#a855f7",fontFamily:"var(--font-orbitron)",fontWeight:700,fontSize:11,letterSpacing:2,padding:"12px 24px",borderRadius:100,border:"1px solid rgba(168,85,247,0.25)"}}>
+            <Bomb size={13} strokeWidth={1.8}/> PLAY MINES
           </Link>
         </div>
       </div>
 
-      {/* Decorative citrus ring */}
-      <div style={{position:"absolute",right:60,top:"50%",transform:"translateY(-50%)",opacity:.06}}>
-        <svg width="160" height="160" viewBox="0 0 160 160" fill="none">
-          <circle cx="80" cy="80" r="75" stroke="#f59e0b" strokeWidth="2"/>
-          <circle cx="80" cy="80" r="55" stroke="#f59e0b" strokeWidth="1.5"/>
-          <circle cx="80" cy="80" r="35" stroke="#f59e0b" strokeWidth="1"/>
-          <line x1="80" y1="5" x2="80" y2="155" stroke="#f59e0b" strokeWidth="1"/>
-          <line x1="5" y1="80" x2="155" y2="80" stroke="#f59e0b" strokeWidth="1"/>
-          <line x1="27" y1="27" x2="133" y2="133" stroke="#f59e0b" strokeWidth="1"/>
-          <line x1="133" y1="27" x2="27" y2="133" stroke="#f59e0b" strokeWidth="1"/>
-          <circle cx="80" cy="80" r="8" fill="#f59e0b"/>
+      {/* Right: decorative rings + floating elements */}
+      <div style={{position:"absolute",right:80,top:"50%",transform:"translateY(-50%)",opacity:.08,pointerEvents:"none"}}>
+        <svg width="220" height="220" viewBox="0 0 220 220" fill="none">
+          <circle cx="110" cy="110" r="105" stroke="#f59e0b" strokeWidth="1.5"/>
+          <circle cx="110" cy="110" r="80" stroke="#f59e0b" strokeWidth="1" strokeDasharray="8 4"/>
+          <circle cx="110" cy="110" r="55" stroke="#f59e0b" strokeWidth="1"/>
+          <circle cx="110" cy="110" r="30" stroke="#f59e0b" strokeWidth="0.5" strokeDasharray="4 3"/>
+          {[0,45,90,135,180,225,270,315].map(a=>{const r=105,x=110+r*Math.cos(a*Math.PI/180),y=110+r*Math.sin(a*Math.PI/180);return<circle key={a} cx={x} cy={y} r="4" fill="#f59e0b"/>;})}
         </svg>
+      </div>
+
+      {/* Stats strip at bottom */}
+      <div style={{position:"absolute",bottom:0,left:0,right:0,height:48,background:"rgba(0,0,0,0.4)",backdropFilter:"blur(12px)",borderTop:"1px solid rgba(245,158,11,0.08)",display:"flex",alignItems:"center",paddingLeft:52,gap:32,zIndex:3}}>
+        {[{l:"Total Bets",v:"128,421+",c:"#f59e0b"},{l:"SOL Wagered",v:"642,891 ◎",c:"#10b981"},{l:"Players Online",v:"3,847",c:"#06b6d4"},{l:"House Edge",v:"~5%",c:"#a78bfa"}].map(s=>(
+          <div key={s.l} style={{display:"flex",alignItems:"center",gap:8}}>
+            <span style={{fontSize:9,color:"#374151",letterSpacing:2,textTransform:"uppercase"}}>{s.l}</span>
+            <span style={{fontFamily:"var(--font-orbitron)",fontWeight:800,fontSize:12,color:s.c}}>{s.v}</span>
+          </div>
+        ))}
       </div>
     </div>
   );
@@ -429,34 +509,80 @@ function StatsRow() {
 }
 
 /* ─────────────────────────────── GAME TILE ── */
-function GameTile({g}:{g:typeof GAMES[0]}) {
+function GameTile({g,idx}:{g:typeof GAMES[0];idx:number}) {
   return(
     <Link href={g.href} style={{textDecoration:"none",display:"block",cursor:"pointer"}}>
-      <div className="game-tile" style={{position:"relative",boxShadow:`0 4px 24px rgba(0,0,0,0.5)`}}
-        onMouseEnter={e=>{ (e.currentTarget as HTMLDivElement).style.boxShadow=`0 20px 60px rgba(0,0,0,0.6), 0 0 80px ${g.accent}20, 0 0 0 1px ${g.accent}25`; }}
-        onMouseLeave={e=>{ (e.currentTarget as HTMLDivElement).style.boxShadow="0 4px 24px rgba(0,0,0,0.5)"; }}>
+      <div className="game-tile" style={{
+        position:"relative",
+        animation:`tile-enter 0.5s cubic-bezier(0.23,1,0.32,1) ${idx*0.07}s both`,
+        borderTop:`2px solid ${g.accent}`,
+        boxShadow:"0 4px 32px rgba(0,0,0,0.5)",
+      }}
+        onMouseEnter={e=>{
+          const el=e.currentTarget as HTMLDivElement;
+          el.style.boxShadow=`0 24px 60px rgba(0,0,0,0.7), 0 0 0 1px ${g.accent}50, 0 0 60px ${g.accent}12`;
+          el.style.borderTopColor=g.accent;
+        }}
+        onMouseLeave={e=>{
+          const el=e.currentTarget as HTMLDivElement;
+          el.style.boxShadow="0 4px 32px rgba(0,0,0,0.5)";
+          el.style.borderTopColor=g.accent;
+        }}>
 
-        {/* Art */}
-        <div style={{height:148,background:g.bg,position:"relative",overflow:"hidden"}}>
+        {/* Art area */}
+        <div style={{height:210,background:g.bg,position:"relative",overflow:"hidden"}}>
           {g.art}
-          {g.hot&&<div style={{position:"absolute",top:10,left:10,zIndex:5,fontSize:9,fontWeight:800,letterSpacing:2,background:"rgba(245,158,11,0.12)",color:"#f5c518",border:"1px solid rgba(245,158,11,0.35)",borderRadius:100,padding:"3px 9px",display:"flex",alignItems:"center",gap:4}}><Flame size={9} strokeWidth={2.5}/>HOT</div>}
-          <div style={{position:"absolute",top:10,right:10,zIndex:5,fontSize:9,color:"#4a4b6a",background:"rgba(0,0,0,0.55)",borderRadius:100,padding:"3px 8px",display:"flex",alignItems:"center",gap:4}}>
+
+          {/* Bottom fade into info */}
+          <div style={{position:"absolute",bottom:0,left:0,right:0,height:70,background:`linear-gradient(to top, rgba(22,18,8,0.95) 0%, transparent 100%)`,zIndex:4}}/>
+
+          {/* Badge top-left */}
+          {g.badge&&(
+            <div className={g.badge==="HOT"?"hot-badge":""} style={{
+              position:"absolute",top:12,left:12,zIndex:6,
+              fontSize:9,fontWeight:800,letterSpacing:2,
+              background:g.badge==="LIVE"?"rgba(16,185,129,0.15)":"rgba(245,158,11,0.12)",
+              color:g.badge==="LIVE"?"#10b981":"#f5c518",
+              border:`1px solid ${g.badge==="LIVE"?"rgba(16,185,129,0.5)":"rgba(245,158,11,0.4)"}`,
+              borderRadius:100,padding:"4px 10px",
+              display:"flex",alignItems:"center",gap:4,
+            }}>
+              {g.badge==="LIVE"
+                ?<><span style={{width:5,height:5,borderRadius:"50%",background:"#10b981",display:"inline-block",boxShadow:"0 0 5px #10b981",animation:"live-pulse 1.6s ease-in-out infinite"}}/>LIVE</>
+                :<><Flame size={9} strokeWidth={2.5}/>{g.badge}</>
+              }
+            </div>
+          )}
+
+          {/* Players online top-right */}
+          <div style={{position:"absolute",top:12,right:12,zIndex:6,fontSize:9,color:"#6b7280",background:"rgba(0,0,0,0.6)",backdropFilter:"blur(8px)",borderRadius:100,padding:"4px 10px",display:"flex",alignItems:"center",gap:5,border:"1px solid rgba(255,255,255,0.06)"}}>
             <span style={{width:5,height:5,borderRadius:"50%",background:"#10b981",display:"inline-block",boxShadow:"0 0 4px #10b981"}}/>
-            {g.players}
+            <span style={{fontWeight:600}}>{g.players} playing</span>
           </div>
-          {/* Hover overlay */}
-          <div className="game-tile-overlay">
-            <div className="btn-primary" style={{fontSize:13,padding:"10px 28px",pointerEvents:"none"}}>Play Now</div>
+
+          {/* Max mult bottom-left (above fade) */}
+          <div style={{position:"absolute",bottom:14,left:14,zIndex:5,display:"flex",alignItems:"center",gap:5}}>
+            <span style={{fontFamily:"var(--font-orbitron)",fontSize:11,fontWeight:900,color:g.accent,textShadow:`0 0 12px ${g.accent}`,letterSpacing:1}}>UP TO {g.maxMult}</span>
+          </div>
+
+          {/* Slide-up PLAY button */}
+          <div className="game-tile-play">
+            <div style={{background:g.accent,color:"#000",fontFamily:"var(--font-orbitron)",fontWeight:900,fontSize:11,letterSpacing:3,padding:"10px 28px",borderRadius:100,boxShadow:`0 0 24px ${g.accent}70`,pointerEvents:"none"}}>
+              PLAY NOW
+            </div>
           </div>
         </div>
 
-        {/* Info */}
-        <div style={{padding:"14px 16px",background:"var(--bg-card)",borderTop:"1px solid var(--border)"}}>
-          <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:4}}>
-            <span style={{fontFamily:"var(--font-orbitron)",fontWeight:800,fontSize:13,color:"#e2e4f0",letterSpacing:1}}>{g.label}</span>
-            <span style={{fontFamily:"var(--font-orbitron)",fontSize:11,color:g.accent,fontWeight:700,display:"flex",alignItems:"center",gap:3}}><TrendingUp size={11} strokeWidth={2.5}/>{g.maxMult}</span>
+        {/* Info bar */}
+        <div style={{padding:"13px 16px 15px",background:"var(--bg-card)",borderTop:`1px solid ${g.accent}20`,display:"flex",alignItems:"center",justifyContent:"space-between",gap:8}}>
+          <div>
+            <div style={{fontFamily:"var(--font-orbitron)",fontWeight:900,fontSize:13,color:"#fff",letterSpacing:1,marginBottom:3}}>{g.label}</div>
+            <p style={{fontSize:11,color:"#4b5563",lineHeight:1.4}}>{g.desc}</p>
           </div>
-          <p style={{fontSize:11,color:"#4a4b6a"}}>{g.desc}</p>
+          <div style={{flexShrink:0,display:"flex",alignItems:"center",gap:5,background:`${g.accent}12`,border:`1px solid ${g.accent}25`,borderRadius:8,padding:"6px 10px"}}>
+            <TrendingUp size={10} strokeWidth={2.5} style={{color:g.accent}}/>
+            <span style={{fontFamily:"var(--font-orbitron)",fontSize:10,color:g.accent,fontWeight:800}}>{g.maxMult}</span>
+          </div>
         </div>
       </div>
     </Link>
@@ -552,7 +678,7 @@ function LobbyContent() {
                 <span style={{fontSize:10,color:"#2a2b4a"}}>5 available</span>
               </div>
               <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:14}}>
-                {GAMES.map(g=><GameTile key={g.href} g={g}/>)}
+                {GAMES.map((g,i)=><GameTile key={g.href} g={g} idx={i}/>)}
               </div>
             </div>
             <div style={{position:"sticky",top:84}}>

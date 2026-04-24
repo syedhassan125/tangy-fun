@@ -345,6 +345,86 @@ input:focus { outline: none; }
 .btn-primary { animation: cta-pulse 2.5s ease-in-out infinite; }
 .btn-primary:hover { animation: none; transform: translateY(-2px); box-shadow: 0 8px 30px rgba(245,158,11,0.5); }
 
+/* ── Tile entrance stagger ── */
+@keyframes tile-enter {
+  from { opacity: 0; transform: translateY(28px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0)    scale(1); }
+}
+
+/* ── Win flash overlay ── */
+@keyframes win-flash {
+  0%   { opacity: 0; }
+  15%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+.win-flash-overlay {
+  position: fixed; inset: 0; z-index: 9000; pointer-events: none;
+  background: radial-gradient(ellipse at center, rgba(16,185,129,0.18) 0%, transparent 70%);
+  animation: win-flash 1.2s ease-out forwards;
+}
+.loss-flash-overlay {
+  position: fixed; inset: 0; z-index: 9000; pointer-events: none;
+  background: radial-gradient(ellipse at center, rgba(239,68,68,0.12) 0%, transparent 70%);
+  animation: win-flash 0.7s ease-out forwards;
+}
+
+/* ── Confetti particle ── */
+@keyframes confetti-fall {
+  0%   { transform: translateY(-20px) rotate(0deg) scale(1); opacity: 1; }
+  100% { transform: translateY(120px) rotate(720deg) scale(0.5); opacity: 0; }
+}
+
+/* ── Win amount flyup ── */
+@keyframes amount-flyup {
+  0%   { transform: translateY(0) scale(1); opacity: 1; }
+  100% { transform: translateY(-60px) scale(1.3); opacity: 0; }
+}
+.amount-flyup { animation: amount-flyup 1s cubic-bezier(0.23,1,0.32,1) forwards; }
+
+/* ── Hot badge pulse ── */
+@keyframes hot-pulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(245,158,11,0.4); }
+  50%      { box-shadow: 0 0 0 4px rgba(245,158,11,0); }
+}
+.hot-badge { animation: hot-pulse 2s ease-in-out infinite; }
+
+/* ── Game tile play overlay (slide up) ── */
+.game-tile-play {
+  position: absolute; inset: 0;
+  display: flex; align-items: flex-end; justify-content: center;
+  padding-bottom: 20px;
+  opacity: 0; transform: translateY(8px);
+  transition: opacity 0.22s ease-out, transform 0.22s ease-out;
+  z-index: 10;
+}
+.game-tile:hover .game-tile-play { opacity: 1; transform: translateY(0); }
+
+/* ── Ticker bar ── */
+@keyframes ticker-scroll {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.ticker-track { animation: ticker-scroll 30s linear infinite; }
+.ticker-track:hover { animation-play-state: paused; }
+
+/* ── Section divider line ── */
+.section-line {
+  display: flex; align-items: center; gap: 14px;
+  margin-bottom: 16px;
+}
+.section-line::after {
+  content: ''; flex: 1; height: 1px;
+  background: linear-gradient(90deg, var(--border), transparent);
+}
+
+/* ── Number animate ── */
+@keyframes num-pop {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+.num-pop { animation: num-pop 0.3s ease-out; }
+
 /* ── Reduced motion — disable all animations ── */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

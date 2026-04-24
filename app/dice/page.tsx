@@ -3,6 +3,7 @@ import { useState } from "react";
 import { WalletProvider, useWallet } from "../components/WalletContext";
 import GameLayout from "../components/GameLayout";
 import BetHistory, { BetRecord } from "../components/BetHistory";
+import WinEffect from "../components/WinEffect";
 
 const BET_AMOUNTS = [0.1, 0.25, 0.5, 1, 2, 5];
 const HOUSE_EDGE = 0.05;
@@ -26,6 +27,7 @@ function DiceGame() {
   const [betAmount, setBetAmount] = useState(0.1);
   const [customBet, setCustomBet] = useState("");
   const [rolling, setRolling] = useState(false);
+  const [winTrigger, setWinTrigger] = useState(false);
   const [result, setResult] = useState<null | { roll: number; won: boolean; payout: number }>(null);
   const [history, setHistory] = useState<BetRecord[]>([]);
 
@@ -42,6 +44,7 @@ function DiceGame() {
     const rolled = Math.floor(Math.random() * 100) + 1;
     const won = over ? rolled > target : rolled < target;
     updateBalance(won ? balance - activeBet + payout : balance - activeBet);
+    if (won) setWinTrigger(t => !t);
     setResult({ roll: rolled, won, payout });
     setHistory(h => [...h, { id: Date.now().toString(), game: `Dice (${over ? ">" : "<"}${target})`, amount: activeBet, result: won ? "win" : "loss", payout, time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) }]);
     setRolling(false);
@@ -52,6 +55,7 @@ function DiceGame() {
 
   return (
     <GameLayout title="DICE" accent={accent} icon={ICON}>
+      <WinEffect trigger={winTrigger} amount={result?.won ? payout - activeBet : undefined} accent={accent}/>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 320px", gap: 20, alignItems: "start" }}>
 
         {/* LEFT */}

@@ -4,6 +4,7 @@ import Image from "next/image";
 import { WalletProvider, useWallet } from "../components/WalletContext";
 import GameLayout from "../components/GameLayout";
 import BetHistory, { BetRecord } from "../components/BetHistory";
+import WinEffect from "../components/WinEffect";
 
 const BET_AMOUNTS = [0.1, 0.25, 0.5, 1, 2, 5];
 const HOUSE_EDGE = 0.05;
@@ -22,6 +23,7 @@ function CoinFlipGame() {
   const [result, setResult] = useState<null | { outcome: "heads" | "tails"; won: boolean; payout: number }>(null);
   const [history, setHistory] = useState<BetRecord[]>([]);
   const [streak, setStreak] = useState(0);
+  const [winTrigger, setWinTrigger] = useState(false);
   const coinRef = useRef<HTMLDivElement>(null);
 
   const activeBet = customBet !== "" ? parseFloat(customBet) || 0 : betAmount;
@@ -34,6 +36,7 @@ function CoinFlipGame() {
     const outcome: "heads" | "tails" = Math.random() < 0.5 ? "heads" : "tails";
     const won = outcome === side;
     updateBalance(won ? balance - activeBet + payout : balance - activeBet);
+    if (won) setWinTrigger(t => !t);
     setStreak(s => won ? s + 1 : 0);
     setHistory(h => [...h, { id: Date.now().toString(), game: `Coin Flip (${side})`, amount: activeBet, result: won ? "win" : "loss", payout, time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) }]);
     setResult({ outcome, won, payout });
@@ -44,6 +47,7 @@ function CoinFlipGame() {
 
   return (
     <GameLayout title="COIN FLIP" accent="#10b981" icon={ICON}>
+      <WinEffect trigger={winTrigger} amount={result?.won ? payout - activeBet : undefined} accent="#10b981"/>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 320px", gap: 20, alignItems: "start" }}>
 
         {/* LEFT: game + controls */}
