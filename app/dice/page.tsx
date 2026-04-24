@@ -28,6 +28,7 @@ function DiceGame() {
   const [customBet, setCustomBet] = useState("");
   const [rolling, setRolling] = useState(false);
   const [winTrigger, setWinTrigger] = useState(false);
+  const [displayRoll, setDisplayRoll] = useState<number | null>(null);
   const [result, setResult] = useState<null | { roll: number; won: boolean; payout: number }>(null);
   const [history, setHistory] = useState<BetRecord[]>([]);
 
@@ -39,9 +40,15 @@ function DiceGame() {
 
   const roll = async () => {
     if (!connected || activeBet <= 0 || activeBet > balance || rolling) return;
-    setRolling(true); setResult(null);
-    await new Promise(r => setTimeout(r, 900));
+    setRolling(true); setResult(null); setDisplayRoll(null);
+    // Rapid number cycling for 800ms
+    const cycleInterval = setInterval(() => {
+      setDisplayRoll(Math.floor(Math.random() * 100) + 1);
+    }, 60);
+    await new Promise(r => setTimeout(r, 860));
+    clearInterval(cycleInterval);
     const rolled = Math.floor(Math.random() * 100) + 1;
+    setDisplayRoll(rolled);
     const won = over ? rolled > target : rolled < target;
     updateBalance(won ? balance - activeBet + payout : balance - activeBet);
     if (won) setWinTrigger(t => !t);
@@ -77,17 +84,18 @@ function DiceGame() {
             <div style={{ position: "relative", zIndex: 2, textAlign: "center" }}>
               <div style={{
                 fontFamily: "var(--font-orbitron, monospace)", fontWeight: 900,
-                fontSize: rolling ? 72 : result ? 100 : 72,
-                color: rolling ? "#374151" : resultAccent,
+                fontSize: result ? 108 : 80,
+                color: rolling ? "#4b5563" : resultAccent,
                 textShadow: rolling ? "none" : `0 0 40px ${resultAccent}, 0 0 80px ${resultAccent}40`,
-                letterSpacing: 4, lineHeight: 1, transition: "all 0.3s ease",
+                letterSpacing: 4, lineHeight: 1,
+                transition: rolling ? "none" : "color 0.3s ease, text-shadow 0.3s ease, font-size 0.2s ease",
               }}>
-                {rolling ? "??" : result ? result.roll.toString().padStart(2, "0") : "--"}
+                {displayRoll !== null ? displayRoll.toString().padStart(2, "0") : "--"}
               </div>
-              {rolling && <div style={{ fontSize: 12, color: "#374151", letterSpacing: 3, textTransform: "uppercase", marginTop: 8 }}>Rolling...</div>}
+              {rolling && <div style={{ fontSize: 11, color: "#374151", letterSpacing: 4, textTransform: "uppercase", marginTop: 10, fontFamily:"var(--font-orbitron)" }}>Rolling...</div>}
               {result && !rolling && (
-                <div style={{ marginTop: 12 }}>
-                  <div style={{ fontFamily: "var(--font-orbitron, monospace)", fontWeight: 900, fontSize: 20, color: resultAccent, letterSpacing: 3, textShadow: `0 0 16px ${resultAccent}` }}>
+                <div className="slide-up" style={{ marginTop: 12 }}>
+                  <div style={{ fontFamily: "var(--font-orbitron, monospace)", fontWeight: 900, fontSize: 22, color: resultAccent, letterSpacing: 3, textShadow: `0 0 20px ${resultAccent}` }}>
                     {result.won ? "WIN!" : "LOST"}
                   </div>
                   <div style={{ fontSize: 13, color: "#6b7280", marginTop: 4 }}>

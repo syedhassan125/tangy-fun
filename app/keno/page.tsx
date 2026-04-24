@@ -3,6 +3,7 @@ import { useState, useCallback, useRef } from "react";
 import { WalletProvider, useWallet } from "../components/WalletContext";
 import GameLayout from "../components/GameLayout";
 import BetHistory, { BetRecord } from "../components/BetHistory";
+import WinEffect from "../components/WinEffect";
 
 const TOTAL_BALLS = 40;
 const DRAW_COUNT = 20;
@@ -50,6 +51,8 @@ function KenoGame() {
   const [phase, setPhase] = useState<Phase>("pick");
   const [history, setHistory] = useState<BetRecord[]>([]);
   const [lastResult, setLastResult] = useState<{ multiplier: number; payout: number; matches: number } | null>(null);
+  const [winTrigger, setWinTrigger] = useState(false);
+  const [hitNumbers, setHitNumbers] = useState<Set<number>>(new Set());
   const drawTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const activeBet = customBet !== "" ? parseFloat(customBet) || 0 : betAmount;
@@ -99,14 +102,15 @@ function KenoGame() {
       const t = setTimeout(() => {
         setDrawProgress(prev => [...prev, num]);
         if (idx === drawnNums.length - 1) {
-          // All drawn — compute result
           const matchCount = drawnNums.filter(n => picks.has(n)).length;
           const mult = getMultiplier(picks.size, matchCount);
           const payout = activeBet * mult;
           const won = payout > 0;
+          setHitNumbers(new Set(drawnNums.filter(n => picks.has(n))));
 
           if (won) {
             updateBalance(balance - activeBet + payout);
+            setWinTrigger(t => !t);
           } else {
             updateBalance(balance - activeBet);
           }
@@ -134,7 +138,7 @@ function KenoGame() {
     setDrawn([]);
     setDrawProgress([]);
     setLastResult(null);
-    // Keep picks for next game
+    setHitNumbers(new Set());
   };
 
   const isDrawn = (n: number) => drawn.includes(n);
@@ -150,6 +154,7 @@ function KenoGame() {
 
   return (
     <GameLayout title="KENO" accent={accent} icon={ICON}>
+      <WinEffect trigger={winTrigger} amount={lastResult && lastResult.payout > 0 ? lastResult.payout - activeBet : undefined} accent={accent}/>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 320px", gap: 20, alignItems: "start" }}>
 
         {/* LEFT: grid + controls */}
@@ -247,6 +252,7 @@ function KenoGame() {
                 return (
                   <button key={num} onClick={() => togglePick(num)}
                     disabled={phase !== "pick" || (!picked && picks.size >= MAX_PICKS)}
+                    className={hitNumbers.has(num) && phase === "done" ? "ball-hit" : ""}
                     style={{
                       aspectRatio: "1", borderRadius: 10, fontSize: 13,
                       fontWeight, fontFamily: "var(--font-orbitron, monospace)",
@@ -254,7 +260,7 @@ function KenoGame() {
                       cursor: phase === "pick" && (picked || picks.size < MAX_PICKS) ? "pointer" : "default",
                       transition: "all 0.15s cubic-bezier(0.23,1,0.32,1)",
                       background: bg, border, color,
-                      boxShadow: shadow,
+                      boxShadow: hitNumbers.has(num) && phase === "done" ? `0 0 20px ${accent}` : shadow,
                       transform: scale,
                     }}>
                     {num}

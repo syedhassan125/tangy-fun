@@ -3,6 +3,7 @@ import { useState, useCallback } from "react";
 import { WalletProvider, useWallet } from "../components/WalletContext";
 import GameLayout from "../components/GameLayout";
 import BetHistory, { BetRecord } from "../components/BetHistory";
+import WinEffect from "../components/WinEffect";
 
 const GRID_SIZE = 25;
 const BET_AMOUNTS = [0.1, 0.25, 0.5, 1, 2, 5];
@@ -38,6 +39,10 @@ function MinesGame() {
   const [mines, setMines] = useState<Set<number>>(new Set());
   const [revealed, setRevealed] = useState(0);
   const [history, setHistory] = useState<BetRecord[]>([]);
+  const [winTrigger, setWinTrigger] = useState(false);
+  const [explodedIndex, setExplodedIndex] = useState<number | null>(null);
+  const [shaking, setShaking] = useState(false);
+  const [popIndex, setPopIndex] = useState<number | null>(null);
 
   const activeBet = customBet !== "" ? parseFloat(customBet) || 0 : betAmount;
   const currentMultiplier = calcMultiplier(mineCount, revealed);
@@ -60,12 +65,19 @@ function MinesGame() {
     const isMine = mines.has(index);
     const newTiles = [...tiles];
     if (isMine) {
-      newTiles[index] = "mine";
-      mines.forEach(m => { newTiles[m] = "mine"; });
-      setTiles(newTiles); setPhase("done");
+      setExplodedIndex(index);
+      setShaking(true);
+      setTimeout(() => setShaking(false), 600);
+      setTimeout(() => {
+        newTiles[index] = "mine";
+        mines.forEach(m => { newTiles[m] = "mine"; });
+        setTiles(newTiles); setPhase("done");
+      }, 120);
       updateBalance(balance - activeBet);
       setHistory(h => [...h, { id: Date.now().toString(), game: `Mines (${mineCount} mines, ${revealed} safe)`, amount: activeBet, result: "loss", payout: 0, time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) }]);
     } else {
+      setPopIndex(index);
+      setTimeout(() => setPopIndex(null), 300);
       newTiles[index] = "safe";
       setTiles(newTiles);
       const newRevealed = revealed + 1;
@@ -73,6 +85,7 @@ function MinesGame() {
       if (newRevealed === safeTiles) {
         const payout = activeBet * calcMultiplier(mineCount, newRevealed);
         updateBalance(balance - activeBet + payout);
+        setWinTrigger(t => !t);
         setPhase("done");
         setHistory(h => [...h, { id: Date.now().toString(), game: `Mines (all safe!)`, amount: activeBet, result: "win", payout, time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) }]);
       }
@@ -82,18 +95,20 @@ function MinesGame() {
   const cashout = () => {
     if (phase !== "playing" || revealed === 0) return;
     updateBalance(balance - activeBet + currentPayout);
+    setWinTrigger(t => !t);
     const newTiles = [...tiles];
     mines.forEach(m => { if (newTiles[m] === "hidden") newTiles[m] = "mine"; });
     setTiles(newTiles); setPhase("done");
     setHistory(h => [...h, { id: Date.now().toString(), game: `Mines (${mineCount} mines, ${revealed} safe)`, amount: activeBet, result: "win", payout: currentPayout, time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) }]);
   };
 
-  const reset = () => { setPhase("bet"); setTiles(Array(GRID_SIZE).fill("hidden")); setRevealed(0); setMines(new Set()); };
+  const reset = () => { setPhase("bet"); setTiles(Array(GRID_SIZE).fill("hidden")); setRevealed(0); setMines(new Set()); setExplodedIndex(null); };
 
   const accent = "#a855f7";
 
   return (
     <GameLayout title="MINES" accent={accent} icon={ICON}>
+      <WinEffect trigger={winTrigger} amount={history[history.length-1]?.result==="win" ? history[history.length-1].payout - history[history.length-1].amount : undefined} accent={accent}/>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 320px", gap: 20, alignItems: "start" }}>
 
         {/* LEFT: grid + controls */}
@@ -125,27 +140,57 @@ function MinesGame() {
             )}
 
             {/* Tile grid */}
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 8 }}>
-              {tiles.map((state, i) => (
-                <button key={i} onClick={() => clickTile(i)}
-                  disabled={phase !== "playing" || state !== "hidden"}
-                  style={{
-                    aspectRatio: "1", borderRadius: 10, fontSize: 22,
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    cursor: phase === "playing" && state === "hidden" ? "pointer" : "default",
-                    transition: "all 0.18s cubic-bezier(0.23,1,0.32,1)",
-                    border: state === "safe" ? "1px solid rgba(16,185,129,0.5)" : state === "mine" ? "1px solid rgba(239,68,68,0.5)" : "1px solid rgba(168,85,247,0.15)",
-                    background: state === "safe" ? "rgba(16,185,129,0.15)" : state === "mine" ? "rgba(239,68,68,0.12)" : phase === "playing" ? "rgba(168,85,247,0.06)" : "rgba(255,255,255,0.02)",
-                    boxShadow: state === "safe" ? "0 0 14px rgba(16,185,129,0.25)" : state === "mine" ? "0 0 14px rgba(239,68,68,0.3)" : "none",
-                    transform: state === "safe" ? "scale(1.02)" : "scale(1)",
-                  }}>
-                  {state === "safe" && <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" fill="#10b981" opacity=".9"/></svg>}
-                  {state === "mine" && <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="13" r="6" fill="#ef4444" opacity=".9"/><line x1="12" y1="6" x2="12" y2="4" stroke="#ef4444" strokeWidth="2" strokeLinecap="round"/><line x1="16" y1="7.5" x2="17.5" y2="6" stroke="#ef4444" strokeWidth="1.5" strokeLinecap="round"/></svg>}
-                  {state === "hidden" && phase === "playing" && (
-                    <div style={{ width: 8, height: 8, borderRadius: "50%", background: "rgba(168,85,247,0.3)" }}/>
-                  )}
-                </button>
-              ))}
+            <div className={shaking ? "screen-shake" : ""} style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 8 }}>
+              {tiles.map((state, i) => {
+                const isExploding = i === explodedIndex;
+                const isPopping = i === popIndex && state === "safe";
+                const isCashoutWin = phase === "done" && history[history.length-1]?.result === "win" && state === "safe";
+                return (
+                  <button key={i} onClick={() => clickTile(i)}
+                    disabled={phase !== "playing" || state !== "hidden"}
+                    className={isPopping ? "tile-pop" : isExploding ? "explosion-ring" : ""}
+                    style={{
+                      aspectRatio: "1", borderRadius: 10, fontSize: 22,
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      cursor: phase === "playing" && state === "hidden" ? "pointer" : "default",
+                      transition: "background 0.2s, border-color 0.2s, box-shadow 0.2s",
+                      border: state === "safe"
+                        ? `1px solid ${isCashoutWin ? "rgba(16,185,129,0.9)" : "rgba(16,185,129,0.5)"}`
+                        : state === "mine"
+                        ? "1px solid rgba(239,68,68,0.7)"
+                        : phase === "playing" ? "1px solid rgba(168,85,247,0.2)" : "1px solid rgba(255,255,255,0.04)",
+                      background: state === "safe"
+                        ? isCashoutWin ? "rgba(16,185,129,0.25)" : "rgba(16,185,129,0.15)"
+                        : state === "mine"
+                        ? isExploding ? "rgba(239,68,68,0.35)" : "rgba(239,68,68,0.12)"
+                        : phase === "playing" ? "rgba(168,85,247,0.06)" : "rgba(255,255,255,0.02)",
+                      boxShadow: state === "safe"
+                        ? isCashoutWin ? "0 0 20px rgba(16,185,129,0.5)" : "0 0 10px rgba(16,185,129,0.2)"
+                        : state === "mine"
+                        ? isExploding ? "0 0 30px rgba(239,68,68,0.8)" : "0 0 14px rgba(239,68,68,0.3)"
+                        : "none",
+                    }}>
+                    {state === "safe" && (
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className={isPopping ? "gem-sparkle" : ""}>
+                        <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" fill="#10b981" opacity=".95"/>
+                        <polygon points="12,2 15.09,8.26 12,10 8.91,8.26" fill="rgba(255,255,255,0.35)"/>
+                      </svg>
+                    )}
+                    {state === "mine" && (
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                        <circle cx="12" cy="13" r="7" fill={isExploding ? "#f97316" : "#ef4444"} opacity=".95"/>
+                        <line x1="12" y1="6" x2="12" y2="3" stroke="#ef4444" strokeWidth="2" strokeLinecap="round"/>
+                        <line x1="17" y1="8" x2="19" y2="6" stroke="#ef4444" strokeWidth="1.5" strokeLinecap="round"/>
+                        <line x1="7" y1="8" x2="5" y2="6" stroke="#ef4444" strokeWidth="1.5" strokeLinecap="round"/>
+                        <circle cx="9" cy="10" r="2" fill="rgba(255,255,255,0.3)"/>
+                      </svg>
+                    )}
+                    {state === "hidden" && phase === "playing" && (
+                      <div style={{ width: 9, height: 9, borderRadius: "50%", background: "rgba(168,85,247,0.4)", boxShadow: "0 0 6px rgba(168,85,247,0.3)" }}/>
+                    )}
+                  </button>
+                );
+              })}
             </div>
 
             {/* Done state */}

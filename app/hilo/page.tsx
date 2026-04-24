@@ -3,6 +3,7 @@ import { useState } from "react";
 import { WalletProvider, useWallet } from "../components/WalletContext";
 import GameLayout from "../components/GameLayout";
 import BetHistory, { BetRecord } from "../components/BetHistory";
+import WinEffect from "../components/WinEffect";
 
 /* ─── Types ─── */
 type Suit = "♠" | "♥" | "♦" | "♣";
@@ -133,11 +134,16 @@ function HiLoGame() {
   const [betAmount, setBetAmount] = useState(0.1);
   const [customBet, setCustomBet] = useState("");
   const [accMult, setAccMult] = useState(1.0);
+  const [prevMult, setPrevMult] = useState(1.0);
   const [initBet, setInitBet] = useState(0);
   const [lastChoice, setLastChoice] = useState<"hi" | "lo" | null>(null);
   const [wonLast, setWonLast] = useState<boolean | null>(null);
   const [trail, setTrail] = useState<Array<{ card: Card; choice: "hi" | "lo"; won: boolean }>>([]);
   const [history, setHistory] = useState<BetRecord[]>([]);
+  const [winTrigger, setWinTrigger] = useState(false);
+  const [multPop, setMultPop] = useState(false);
+  const [cardFlipping, setCardFlipping] = useState(false);
+  const consecutiveWins = trail.filter(t => t.won).length;
 
   const activeBet = customBet !== "" ? parseFloat(customBet) || 0 : betAmount;
   const potWin = +(initBet * accMult).toFixed(4);
@@ -161,10 +167,11 @@ function HiLoGame() {
     if (!card || phase !== "waiting") return;
     setLastChoice(choice);
     setWonLast(null);
+    setCardFlipping(true);
     setPhase("revealing");
 
-    // brief pause before revealing
-    await new Promise(r => setTimeout(r, 480));
+    await new Promise(r => setTimeout(r, 450));
+    setCardFlipping(false);
 
     const drawn = randCard();
     const won = choice === "hi" ? drawn.value >= card.value : drawn.value <= card.value;
@@ -174,12 +181,14 @@ function HiLoGame() {
     setWonLast(won);
     setTrail(t => [...t, { card, choice, won }]);
 
-    // show result briefly
     await new Promise(r => setTimeout(r, 900));
 
     if (won) {
       const newAcc = +(accMult * stepMult).toFixed(4);
+      setPrevMult(accMult);
       setAccMult(newAcc);
+      setMultPop(true);
+      setTimeout(() => setMultPop(false), 400);
       setCard(drawn);
       setDrawnCard(null);
       setLastChoice(null);
@@ -198,6 +207,7 @@ function HiLoGame() {
   const cashOut = () => {
     if (phase !== "waiting" || accMult <= 1) return;
     updateBalance(balance + potWin);
+    setWinTrigger(t => !t);
     setPhase("cashed");
     setHistory(h => [...h, {
       id: Date.now().toString(), game: "Hi-Lo",
@@ -219,6 +229,7 @@ function HiLoGame() {
 
   return (
     <GameLayout title="HI-LO" accent={ACCENT} icon={ICON}>
+      <WinEffect trigger={winTrigger} amount={potWin - initBet} accent={ACCENT}/>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 320px", gap: 20, alignItems: "start" }}>
 
         {/* ── LEFT ── */}
@@ -335,17 +346,24 @@ function HiLoGame() {
                 </div>
               )}
 
-              {/* Multiplier counter */}
+              {/* Multiplier counter + streak */}
               {isActive && (
                 <div style={{ textAlign: "center" }}>
-                  <div style={{ fontSize: 10, color: "#374151", letterSpacing: 3, marginBottom: 5 }}>ACCUMULATED MULTIPLIER</div>
-                  <div style={{
-                    fontFamily: "var(--font-orbitron,monospace)", fontSize: 30, fontWeight: 900,
-                    color: ACCENT, textShadow: `0 0 28px ${ACCENT}88`,
+                  <div style={{ fontSize: 10, color: "#374151", letterSpacing: 3, marginBottom: 6 }}>ACCUMULATED MULTIPLIER</div>
+                  <div className={multPop ? "mult-pop" : ""} style={{
+                    fontFamily: "var(--font-orbitron,monospace)", fontSize: 36, fontWeight: 900,
+                    color: accMult > prevMult ? "#10b981" : ACCENT,
+                    textShadow: accMult > prevMult ? "0 0 28px #10b981" : `0 0 28px ${ACCENT}88`,
+                    transition: "color 0.3s ease",
                   }}>
                     {accMult.toFixed(2)}×
                   </div>
-                  <div style={{ fontSize: 11, color: "#4b5563", marginTop: 3 }}>Potential payout: {potWin.toFixed(3)} ◎</div>
+                  <div style={{ fontSize: 12, color: "#4b5563", marginTop: 4 }}>Potential payout: <span style={{ color: "#10b981", fontWeight: 700 }}>{potWin.toFixed(3)} ◎</span></div>
+                  {consecutiveWins >= 2 && (
+                    <div style={{ marginTop: 8, fontSize: 11, fontWeight: 800, color: "#f59e0b", letterSpacing: 2, fontFamily: "var(--font-orbitron)", textShadow: "0 0 10px #f59e0b" }}>
+                      🔥 {consecutiveWins} STREAK
+                    </div>
+                  )}
                 </div>
               )}
 

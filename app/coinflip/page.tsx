@@ -69,78 +69,74 @@ function CoinFlipGame() {
 
             {/* Coin */}
             <div ref={coinRef} style={{ position: "relative", zIndex: 2 }}>
-              <div className={spinning ? "coin-spinning" : ""} style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <div className={spinning ? "coin-physics" : result ? "coin-land" : ""} style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
                 <div style={{
-                  width: 140, height: 140, borderRadius: "50%",
+                  width: 150, height: 150, borderRadius: "50%",
                   background: spinning ? "linear-gradient(135deg, #f59e0b, #d97706)" :
                     result ? (result.outcome === "heads"
-                      ? "linear-gradient(135deg, #f59e0b, #fbbf24)"
-                      : "linear-gradient(135deg, #4ade80, #22c55e)")
+                      ? "linear-gradient(135deg, #fbbf24, #f59e0b, #d97706)"
+                      : "linear-gradient(135deg, #4ade80, #22c55e, #15803d)")
                     : "linear-gradient(135deg, #f59e0b, #d97706)",
                   display: "flex", alignItems: "center", justifyContent: "center",
                   boxShadow: result && result.outcome === "heads"
-                    ? "0 0 40px rgba(245,158,11,0.7), 0 0 80px rgba(245,158,11,0.3)"
+                    ? "0 0 50px rgba(245,158,11,0.8), 0 0 100px rgba(245,158,11,0.35), inset 0 2px 8px rgba(255,255,255,0.3)"
                     : result && result.outcome === "tails"
-                    ? "0 0 40px rgba(74,222,128,0.6), 0 0 80px rgba(74,222,128,0.2)"
-                    : "0 0 30px rgba(245,158,11,0.4)",
-                  border: "4px solid rgba(255,255,255,0.2)",
+                    ? "0 0 50px rgba(74,222,128,0.7), 0 0 100px rgba(74,222,128,0.25), inset 0 2px 8px rgba(255,255,255,0.3)"
+                    : "0 0 35px rgba(245,158,11,0.45), inset 0 2px 8px rgba(255,255,255,0.2)",
+                  border: "4px solid rgba(255,255,255,0.25)",
                   overflow: "hidden", position: "relative",
+                  transition: "box-shadow 0.4s ease",
                 }}>
-                  {/* Heads: tangy logo */}
+                  {/* Shine */}
+                  <div style={{ position:"absolute", top:8, left:16, width:40, height:20, borderRadius:"50%", background:"rgba(255,255,255,0.25)", transform:"rotate(-30deg)", pointerEvents:"none" }}/>
                   {(!result || result.outcome === "heads") && (
-                    <Image
-                      src="/tangy-logo.png"
-                      alt="TANGY"
-                      width={100}
-                      height={118}
-                      style={{ objectFit: "contain", mixBlendMode: "screen", position: "relative", zIndex: 1 }}
-                    />
+                    <Image src="/tangy-logo.png" alt="TANGY" width={108} height={128}
+                      style={{ objectFit: "contain", mixBlendMode: "screen", position: "relative", zIndex: 1 }}/>
                   )}
-                  {/* Tails: lime SVG */}
                   {result && result.outcome === "tails" && (
-                    <svg width="72" height="72" viewBox="0 0 72 72" fill="none" style={{ position: "relative", zIndex: 1 }}>
+                    <svg width="80" height="80" viewBox="0 0 72 72" fill="none" style={{ position: "relative", zIndex: 1 }}>
                       <circle cx="36" cy="38" r="28" fill="#16a34a" opacity=".9"/>
-                      <circle cx="36" cy="38" r="28" fill="none" stroke="rgba(255,255,255,0.25)" strokeWidth="2"/>
-                      {/* Segments */}
-                      <line x1="36" y1="10" x2="36" y2="66" stroke="rgba(255,255,255,0.2)" strokeWidth="1.5"/>
-                      <line x1="8" y1="38" x2="64" y2="38" stroke="rgba(255,255,255,0.2)" strokeWidth="1.5"/>
-                      <line x1="16" y1="18" x2="56" y2="58" stroke="rgba(255,255,255,0.15)" strokeWidth="1.5"/>
-                      <line x1="56" y1="18" x2="16" y2="58" stroke="rgba(255,255,255,0.15)" strokeWidth="1.5"/>
-                      {/* Stem */}
+                      <circle cx="36" cy="38" r="28" fill="none" stroke="rgba(255,255,255,0.3)" strokeWidth="2"/>
+                      <line x1="36" y1="10" x2="36" y2="66" stroke="rgba(255,255,255,0.25)" strokeWidth="1.5"/>
+                      <line x1="8" y1="38" x2="64" y2="38" stroke="rgba(255,255,255,0.25)" strokeWidth="1.5"/>
+                      <line x1="16" y1="18" x2="56" y2="58" stroke="rgba(255,255,255,0.18)" strokeWidth="1.5"/>
+                      <line x1="56" y1="18" x2="16" y2="58" stroke="rgba(255,255,255,0.18)" strokeWidth="1.5"/>
                       <path d="M36 10 C36 10 40 4 46 6" stroke="#15803d" strokeWidth="2.5" strokeLinecap="round" fill="none"/>
-                      <ellipse cx="36" cy="38" rx="28" ry="28" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="1"/>
+                      <circle cx="24" cy="26" r="4" fill="rgba(255,255,255,0.2)"/>
                     </svg>
                   )}
                 </div>
               </div>
+              {/* Shadow beneath coin */}
+              <div style={{ width:100, height:12, borderRadius:"50%", background:"rgba(0,0,0,0.4)", filter:"blur(6px)", margin:"8px auto 0" }}/>
             </div>
 
             {/* Result */}
             <div style={{ position: "relative", zIndex: 2, textAlign: "center" }}>
               {spinning && (
-                <div style={{ fontSize: 13, color: "#4b5563", letterSpacing: 3, textTransform: "uppercase" }}>Flipping...</div>
+                <div style={{ fontSize: 13, color: "#4b5563", letterSpacing: 4, textTransform: "uppercase", fontFamily:"var(--font-orbitron)" }}>Flipping...</div>
               )}
               {result && !spinning && (
-                <div>
-                  <div style={{ fontFamily: "var(--font-orbitron, monospace)", fontWeight: 900, fontSize: 26, letterSpacing: 3, color: result.won ? "#10b981" : "#ef4444", textShadow: result.won ? "0 0 20px #10b981" : "0 0 20px #ef4444", marginBottom: 6 }}>
+                <div className="slide-up">
+                  <div style={{ fontFamily: "var(--font-orbitron, monospace)", fontWeight: 900, fontSize: 32, letterSpacing: 3, color: result.won ? "#10b981" : "#ef4444", textShadow: result.won ? "0 0 30px #10b981, 0 0 60px #10b98160" : "0 0 30px #ef4444, 0 0 60px #ef444460", marginBottom: 8 }}>
                     {result.won ? "YOU WON!" : "YOU LOST"}
                   </div>
-                  <div style={{ fontSize: 13, color: "#6b7280" }}>
+                  <div style={{ fontSize: 14, color: "#6b7280" }}>
                     Landed: <span style={{ color: "#fff", fontWeight: 700, textTransform: "uppercase" }}>{result.outcome}</span>
-                    <span style={{ color: result.won ? "#10b981" : "#ef4444", fontWeight: 700, marginLeft: 8 }}>
-                      {result.won ? `+${result.payout.toFixed(3)} ◎` : `-${activeBet.toFixed(3)} ◎`}
+                    <span style={{ color: result.won ? "#10b981" : "#ef4444", fontWeight: 700, marginLeft: 10, fontFamily:"var(--font-orbitron)", fontSize:13 }}>
+                      {result.won ? `+${(payout - activeBet).toFixed(3)} ◎` : `-${activeBet.toFixed(3)} ◎`}
                     </span>
                   </div>
                   {streak > 1 && result.won && (
-                    <div style={{ marginTop: 8, fontSize: 12, color: "#f59e0b", fontWeight: 700, textShadow: "0 0 10px #f59e0b", display:"flex", alignItems:"center", gap:5 }}>
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="#f59e0b" stroke="#f59e0b" strokeWidth="1"><path d="M12 2c0 6-6 8-6 13a6 6 0 0012 0c0-5-6-7-6-13z"/></svg> {streak} WIN STREAK!
+                    <div style={{ marginTop: 10, fontSize: 13, color: "#f59e0b", fontWeight: 800, textShadow: "0 0 12px #f59e0b", display:"flex", alignItems:"center", justifyContent:"center", gap:6, fontFamily:"var(--font-orbitron)", letterSpacing:2 }}>
+                      🔥 {streak}× WIN STREAK!
                     </div>
                   )}
                 </div>
               )}
               {!spinning && !result && (
-                <div style={{ fontSize: 12, color: "#374151", letterSpacing: 2, textTransform: "uppercase" }}>
-                  {side ? `Selected: ${side.toUpperCase()}` : "Pick a side to begin"}
+                <div style={{ fontSize: 12, color: "#374151", letterSpacing: 3, textTransform: "uppercase", fontFamily:"var(--font-orbitron)" }}>
+                  {side ? `${side.toUpperCase()} selected` : "Pick a side to begin"}
                 </div>
               )}
             </div>

@@ -194,6 +194,9 @@ function LastBetGame() {
   const pnl = history.reduce((a, h) => a + (h.result === "win" ? h.payout - h.amount : -h.amount), 0);
   const accent = "#f97316";
 
+  const isDanger = countdown <= 10 && phase === "running";
+  const isCritical = countdown <= 5 && phase === "running";
+
   return (
     <GameLayout title="LAST BET WINS" accent={accent} icon={ICON}>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 300px", gap: 20, alignItems: "start" }}>
@@ -202,15 +205,24 @@ function LastBetGame() {
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
 
           {/* Main arena */}
-          <div style={{
-            background: "linear-gradient(145deg, #1a0800 0%, #2a0f00 50%, #160700 100%)",
-            border: `1px solid ${accent}18`,
+          <div className={isCritical ? "arena-shake" : ""} style={{
+            background: isDanger
+              ? `linear-gradient(145deg, #2a0800 0%, #3d1000 50%, #200600 100%)`
+              : "linear-gradient(145deg, #1a0800 0%, #2a0f00 50%, #160700 100%)",
+            border: `1px solid ${isDanger ? "rgba(239,68,68,0.4)" : `${accent}18`}`,
             borderRadius: 24, padding: 28,
-            boxShadow: `0 0 80px ${accent}06, 0 8px 40px rgba(0,0,0,0.6)`,
+            boxShadow: isDanger
+              ? `0 0 80px rgba(239,68,68,0.15), 0 8px 40px rgba(0,0,0,0.6)`
+              : `0 0 80px ${accent}06, 0 8px 40px rgba(0,0,0,0.6)`,
             position: "relative", overflow: "hidden",
+            transition: "background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease",
           }}>
+            {/* Danger pulse overlay */}
+            {isDanger && (
+              <div className="danger-pulse" style={{ position: "absolute", inset: 0, borderRadius: 24, pointerEvents: "none", zIndex: 1 }}/>
+            )}
             {/* Ambient glow */}
-            <div style={{ position: "absolute", inset: 0, background: `radial-gradient(ellipse at 50% 30%, ${ringColor}06 0%, transparent 65%)`, pointerEvents: "none", transition: "background 0.5s ease" }}/>
+            <div style={{ position: "absolute", inset: 0, background: `radial-gradient(ellipse at 50% 30%, ${isDanger ? "rgba(239,68,68,0.08)" : `${ringColor}06`} 0%, transparent 65%)`, pointerEvents: "none", transition: "background 0.5s ease" }}/>
 
             {/* Snap flash — fires when sudden death triggers */}
             {snapEffect && (
@@ -224,30 +236,33 @@ function LastBetGame() {
 
             {/* Winner overlay */}
             {phase === "winner" && roundWinner && (
-              <div style={{
+              <div className="winner-blast" style={{
                 position: "absolute", inset: 0, zIndex: 20, borderRadius: 24,
-                background: roundWinner.isYou ? "rgba(16,185,129,0.12)" : "rgba(239,68,68,0.08)",
-                display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 12,
-                backdropFilter: "blur(2px)",
+                background: roundWinner.isYou
+                  ? "radial-gradient(ellipse at center, rgba(16,185,129,0.25) 0%, rgba(16,185,129,0.08) 60%, transparent 100%)"
+                  : "radial-gradient(ellipse at center, rgba(239,68,68,0.15) 0%, rgba(239,68,68,0.05) 60%, transparent 100%)",
+                display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 14,
+                backdropFilter: "blur(4px)",
               }}>
                 {roundWinner.isYou ? (
                   <>
-                    <div style={{ fontFamily: "var(--font-orbitron, monospace)", fontWeight: 900, fontSize: 36, color: "#10b981", textShadow: "0 0 40px #10b981", letterSpacing: 4 }}>YOU WON!</div>
-                    <div style={{ fontSize: 20, color: "#10b981", fontWeight: 700 }}>
+                    <div style={{ fontFamily: "var(--font-orbitron, monospace)", fontWeight: 900, fontSize: 42, color: "#10b981", textShadow: "0 0 60px #10b981, 0 0 120px #10b98160", letterSpacing: 4 }}>YOU WON!</div>
+                    <div style={{ fontFamily: "var(--font-orbitron, monospace)", fontWeight: 900, fontSize: 28, color: "#fff", textShadow: "0 0 20px #10b981" }}>
                       +{(jackpot * (1 - HOUSE_EDGE)).toFixed(3)} ◎
                     </div>
-                    <div style={{ fontSize: 12, color: "#6b7280" }}>New round starting...</div>
+                    <div style={{ fontSize: 11, color: "#4b5563", letterSpacing: 3, textTransform: "uppercase" }}>New round starting...</div>
                   </>
                 ) : (
                   <>
-                    <div style={{ fontFamily: "var(--font-orbitron, monospace)", fontWeight: 900, fontSize: 28, color: "#ef4444", textShadow: "0 0 30px #ef4444", letterSpacing: 3 }}>
+                    <div style={{ fontSize: 11, color: "#4b5563", letterSpacing: 3, textTransform: "uppercase", marginBottom: 4 }}>Round Over</div>
+                    <div style={{ fontFamily: "var(--font-orbitron, monospace)", fontWeight: 900, fontSize: 26, color: "#ef4444", textShadow: "0 0 30px #ef4444", letterSpacing: 3 }}>
                       {roundWinner.player.toUpperCase()} WINS
                     </div>
-                    <div style={{ fontSize: 14, color: "#9ca3af", fontWeight: 600 }}>
-                      Walked away with {(jackpot * (1 - HOUSE_EDGE)).toFixed(3)} ◎
+                    <div style={{ fontSize: 16, color: "#9ca3af", fontWeight: 600 }}>
+                      {(jackpot * (1 - HOUSE_EDGE)).toFixed(3)} ◎ claimed
                     </div>
-                    {playerInRound && <div style={{ fontSize: 12, color: "#ef4444" }}>Better luck next round</div>}
-                    <div style={{ fontSize: 12, color: "#6b7280" }}>New round starting...</div>
+                    {playerInRound && <div style={{ fontSize: 12, color: "#ef4444", fontWeight: 700, letterSpacing: 1 }}>You were overtaken — better luck next round</div>}
+                    <div style={{ fontSize: 11, color: "#374151", letterSpacing: 3, textTransform: "uppercase", marginTop: 4 }}>New round starting...</div>
                   </>
                 )}
               </div>

@@ -3,6 +3,7 @@ import { useState, useCallback } from "react";
 import { WalletProvider, useWallet } from "../components/WalletContext";
 import GameLayout from "../components/GameLayout";
 import BetHistory, { BetRecord } from "../components/BetHistory";
+import WinEffect from "../components/WinEffect";
 
 /* ── Card types & deck ── */
 type Suit = "♠" | "♥" | "♦" | "♣";
@@ -94,6 +95,7 @@ function BlackjackGame() {
   const [result, setResult] = useState<GameResult | null>(null);
   const [history, setHistory] = useState<BetRecord[]>([]);
   const [dealing, setDealing] = useState(false);
+  const [winTrigger, setWinTrigger] = useState(false);
 
   const activeBet = customBet !== "" ? parseFloat(customBet) || 0 : betAmount;
   const playerScore = handValue(playerCards);
@@ -150,6 +152,7 @@ function BlackjackGame() {
     const messages = { blackjack: "BLACKJACK! 🃏", win: "YOU WIN! 🎉", loss: "DEALER WINS 💀", push: "PUSH" };
     const balanceChange = outcome === "blackjack" ? payout : outcome === "win" ? payout : outcome === "push" ? 0 : -bet;
     updateBalance(balance + balanceChange);
+    if (outcome === "win" || outcome === "blackjack") setWinTrigger(t => !t);
     setResult({ outcome, message: messages[outcome], payout });
     setPhase("done");
     setHistory(h => [...h, { id: Date.now().toString(), game: playerBJ ? "Blackjack (BJ!)" : "Blackjack", amount: bet, result: outcome === "win" || outcome === "blackjack" ? "win" : "loss", payout: outcome === "blackjack" ? payout : outcome === "win" ? payout : 0, time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) }]);
@@ -162,6 +165,7 @@ function BlackjackGame() {
 
   return (
     <GameLayout title="BLACKJACK" accent={accent} icon={ICON}>
+      <WinEffect trigger={winTrigger} amount={result?.payout} accent={accent}/>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 320px", gap: 20, alignItems: "start" }}>
 
         {/* LEFT: table + controls */}
@@ -187,10 +191,25 @@ function BlackjackGame() {
               }
             </div>
 
-            {/* VS divider */}
+            {/* VS divider with chip */}
             <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
               <div style={{ flex: 1, height: 1, background: "rgba(16,185,129,0.08)" }}/>
-              <div style={{ fontSize: 10, color: "#1f2937", letterSpacing: 4, fontWeight: 700 }}>VS</div>
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <div style={{ fontSize: 10, color: "#1f2937", letterSpacing: 4, fontWeight: 700 }}>VS</div>
+                {(phase === "playing" || phase === "dealer" || phase === "done") && activeBet > 0 && (
+                  <div style={{
+                    width: 44, height: 44, borderRadius: "50%",
+                    background: "linear-gradient(135deg, #ef4444, #b91c1c)",
+                    border: "3px solid rgba(255,255,255,0.2)",
+                    boxShadow: "0 0 16px rgba(239,68,68,0.5)",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    flexDirection: "column",
+                  }}>
+                    <span style={{ fontFamily: "var(--font-orbitron)", fontWeight: 900, fontSize: 8, color: "#fff", lineHeight: 1 }}>BET</span>
+                    <span style={{ fontFamily: "var(--font-orbitron)", fontWeight: 900, fontSize: 9, color: "#fbbf24", lineHeight: 1 }}>{activeBet.toFixed(2)}</span>
+                  </div>
+                )}
+              </div>
               <div style={{ flex: 1, height: 1, background: "rgba(16,185,129,0.08)" }}/>
             </div>
 
@@ -273,8 +292,13 @@ function BlackjackGame() {
             )}
 
             {phase === "dealer" && (
-              <div style={{ padding: "14px", textAlign: "center", fontSize: 12, color: "#374151", letterSpacing: 3, textTransform: "uppercase" }}>
-                Dealer playing...
+              <div style={{ padding: "14px", textAlign: "center" }}>
+                <div style={{ fontSize: 11, color: "#374151", letterSpacing: 3, textTransform: "uppercase", marginBottom: 10 }}>Dealer playing</div>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
+                  {[1,2,3].map(n => (
+                    <div key={n} className={`dot-${n}`} style={{ width: 8, height: 8, borderRadius: "50%", background: accent }}/>
+                  ))}
+                </div>
               </div>
             )}
 
