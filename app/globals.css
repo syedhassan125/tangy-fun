@@ -425,24 +425,62 @@ input:focus { outline: none; }
 }
 .num-pop { animation: num-pop 0.3s ease-out; }
 
-/* ── Coin physics flip ── */
-@keyframes coinPhysics {
-  0%   { transform: rotateY(0deg) scaleX(1); }
-  20%  { transform: rotateY(540deg) scaleX(1); }
-  55%  { transform: rotateY(1260deg) scaleX(1); }
-  80%  { transform: rotateY(1620deg) scaleX(0.15); }
-  88%  { transform: rotateY(1680deg) scaleX(1); }
-  94%  { transform: rotateY(1740deg) scaleX(0.15); }
-  100% { transform: rotateY(1800deg) scaleX(1); }
+/* ── 3D Coin container ── */
+.coin-scene {
+  perspective: 500px;
+  perspective-origin: 50% 50%;
+  display: flex; align-items: center; justify-content: center;
 }
-.coin-physics { animation: coinPhysics 1.6s cubic-bezier(0.22,1,0.36,1) forwards; }
+.coin-3d {
+  position: relative;
+  transform-style: preserve-3d;
+  width: 160px; height: 160px;
+}
+.coin-face {
+  position: absolute; inset: 0;
+  border-radius: 50%;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+}
+.coin-face-back { transform: rotateY(180deg); }
 
-/* ── Coin land flash ── */
-@keyframes coin-land {
-  0%   { box-shadow: 0 0 0 0 rgba(255,255,255,0.6); transform: scale(1.12); }
-  100% { box-shadow: 0 0 0 30px rgba(255,255,255,0); transform: scale(1); }
+/* ── Coin 3D flip — ends on heads (front face) ── */
+@keyframes coinFlipHeads {
+  0%   { transform: translateY(0px)    rotateY(0deg); }
+  18%  { transform: translateY(-90px)  rotateY(540deg); }
+  40%  { transform: translateY(-140px) rotateY(1080deg); }
+  62%  { transform: translateY(-90px)  rotateY(1530deg); }
+  80%  { transform: translateY(-20px)  rotateY(1710deg); }
+  90%  { transform: translateY(-6px)   rotateY(1764deg); }
+  96%  { transform: translateY(-2px)   rotateY(1788deg); }
+  100% { transform: translateY(0px)    rotateY(1800deg); }
 }
-.coin-land { animation: coin-land 0.5s ease-out forwards; }
+/* ── Coin 3D flip — ends on tails (back face) ── */
+@keyframes coinFlipTails {
+  0%   { transform: translateY(0px)    rotateY(0deg); }
+  18%  { transform: translateY(-90px)  rotateY(540deg); }
+  40%  { transform: translateY(-140px) rotateY(1080deg); }
+  62%  { transform: translateY(-90px)  rotateY(1530deg); }
+  80%  { transform: translateY(-20px)  rotateY(1710deg); }
+  90%  { transform: translateY(-6px)   rotateY(1944deg); }
+  96%  { transform: translateY(-2px)   rotateY(1968deg); }
+  100% { transform: translateY(0px)    rotateY(1980deg); }
+}
+.coin-flip-heads { animation: coinFlipHeads 1.8s cubic-bezier(0.15,0.5,0.4,1) forwards; }
+.coin-flip-tails { animation: coinFlipTails 1.8s cubic-bezier(0.15,0.5,0.4,1) forwards; }
+
+/* ── Coin land bounce ── */
+@keyframes coin-bounce {
+  0%   { transform: translateY(0) rotateY(var(--coin-end-rot,0deg)); }
+  30%  { transform: translateY(-14px) rotateY(var(--coin-end-rot,0deg)); }
+  55%  { transform: translateY(0) rotateY(var(--coin-end-rot,0deg)); }
+  75%  { transform: translateY(-5px) rotateY(var(--coin-end-rot,0deg)); }
+  100% { transform: translateY(0) rotateY(var(--coin-end-rot,0deg)); }
+}
+.coin-bounce-heads { animation: coin-bounce 0.5s ease-out forwards; --coin-end-rot: 1800deg; }
+.coin-bounce-tails { animation: coin-bounce 0.5s ease-out forwards; --coin-end-rot: 1980deg; }
 
 /* ── Tile pop (Mines reveal) ── */
 @keyframes tile-pop {

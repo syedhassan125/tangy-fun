@@ -20,6 +20,8 @@ function CoinFlipGame() {
   const [betAmount, setBetAmount] = useState(0.1);
   const [customBet, setCustomBet] = useState("");
   const [spinning, setSpinning] = useState(false);
+  const [landed, setLanded] = useState(false);
+  const [flipOutcome, setFlipOutcome] = useState<"heads" | "tails" | null>(null);
   const [result, setResult] = useState<null | { outcome: "heads" | "tails"; won: boolean; payout: number }>(null);
   const [history, setHistory] = useState<BetRecord[]>([]);
   const [streak, setStreak] = useState(0);
@@ -31,16 +33,19 @@ function CoinFlipGame() {
 
   const flip = async () => {
     if (!connected || !side || activeBet <= 0 || activeBet > balance || spinning) return;
-    setSpinning(true); setResult(null);
-    await new Promise(r => setTimeout(r, 1400));
+    // Determine outcome upfront so animation can land on correct face
     const outcome: "heads" | "tails" = Math.random() < 0.5 ? "heads" : "tails";
     const won = outcome === side;
+    setSpinning(true); setLanded(false); setResult(null); setFlipOutcome(outcome);
+    // Wait for animation (1.8s)
+    await new Promise(r => setTimeout(r, 1800));
+    setSpinning(false); setLanded(true);
+    await new Promise(r => setTimeout(r, 80));
     updateBalance(won ? balance - activeBet + payout : balance - activeBet);
     if (won) setWinTrigger(t => !t);
     setStreak(s => won ? s + 1 : 0);
     setHistory(h => [...h, { id: Date.now().toString(), game: `Coin Flip (${side})`, amount: activeBet, result: won ? "win" : "loss", payout, time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) }]);
     setResult({ outcome, won, payout });
-    setSpinning(false);
   };
 
   const pnl = history.reduce((a, h) => a + (h.result === "win" ? h.payout - h.amount : -h.amount), 0);
@@ -67,48 +72,59 @@ function CoinFlipGame() {
             {/* Glow */}
             <div style={{ position: "absolute", width: 300, height: 300, borderRadius: "50%", background: "radial-gradient(circle, rgba(16,185,129,0.12) 0%, transparent 70%)", filter: "blur(40px)" }}/>
 
-            {/* Coin */}
-            <div ref={coinRef} style={{ position: "relative", zIndex: 2 }}>
-              <div className={spinning ? "coin-physics" : result ? "coin-land" : ""} style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <div style={{
-                  width: 150, height: 150, borderRadius: "50%",
-                  background: spinning ? "linear-gradient(135deg, #f59e0b, #d97706)" :
-                    result ? (result.outcome === "heads"
-                      ? "linear-gradient(135deg, #fbbf24, #f59e0b, #d97706)"
-                      : "linear-gradient(135deg, #4ade80, #22c55e, #15803d)")
-                    : "linear-gradient(135deg, #f59e0b, #d97706)",
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  boxShadow: result && result.outcome === "heads"
-                    ? "0 0 50px rgba(245,158,11,0.8), 0 0 100px rgba(245,158,11,0.35), inset 0 2px 8px rgba(255,255,255,0.3)"
-                    : result && result.outcome === "tails"
-                    ? "0 0 50px rgba(74,222,128,0.7), 0 0 100px rgba(74,222,128,0.25), inset 0 2px 8px rgba(255,255,255,0.3)"
-                    : "0 0 35px rgba(245,158,11,0.45), inset 0 2px 8px rgba(255,255,255,0.2)",
-                  border: "4px solid rgba(255,255,255,0.25)",
-                  overflow: "hidden", position: "relative",
-                  transition: "box-shadow 0.4s ease",
-                }}>
-                  {/* Shine */}
-                  <div style={{ position:"absolute", top:8, left:16, width:40, height:20, borderRadius:"50%", background:"rgba(255,255,255,0.25)", transform:"rotate(-30deg)", pointerEvents:"none" }}/>
-                  {(!result || result.outcome === "heads") && (
-                    <Image src="/tangy-logo.png" alt="TANGY" width={108} height={128}
-                      style={{ objectFit: "contain", mixBlendMode: "screen", position: "relative", zIndex: 1 }}/>
-                  )}
-                  {result && result.outcome === "tails" && (
-                    <svg width="80" height="80" viewBox="0 0 72 72" fill="none" style={{ position: "relative", zIndex: 1 }}>
-                      <circle cx="36" cy="38" r="28" fill="#16a34a" opacity=".9"/>
-                      <circle cx="36" cy="38" r="28" fill="none" stroke="rgba(255,255,255,0.3)" strokeWidth="2"/>
-                      <line x1="36" y1="10" x2="36" y2="66" stroke="rgba(255,255,255,0.25)" strokeWidth="1.5"/>
-                      <line x1="8" y1="38" x2="64" y2="38" stroke="rgba(255,255,255,0.25)" strokeWidth="1.5"/>
-                      <line x1="16" y1="18" x2="56" y2="58" stroke="rgba(255,255,255,0.18)" strokeWidth="1.5"/>
-                      <line x1="56" y1="18" x2="16" y2="58" stroke="rgba(255,255,255,0.18)" strokeWidth="1.5"/>
-                      <path d="M36 10 C36 10 40 4 46 6" stroke="#15803d" strokeWidth="2.5" strokeLinecap="round" fill="none"/>
-                      <circle cx="24" cy="26" r="4" fill="rgba(255,255,255,0.2)"/>
+            {/* 3D Coin */}
+            <div ref={coinRef} style={{ position: "relative", zIndex: 2, display: "flex", flexDirection: "column", alignItems: "center" }}>
+              <div className="coin-scene">
+                <div className={
+                  spinning ? (flipOutcome === "heads" ? "coin-flip-heads" : "coin-flip-tails") :
+                  landed && result ? (result.outcome === "heads" ? "coin-bounce-heads" : "coin-bounce-tails") : ""
+                } style={{ position: "relative", transformStyle: "preserve-3d", width: 160, height: 160 }}>
+
+                  {/* HEADS face (front) */}
+                  <div className="coin-face" style={{
+                    background: "radial-gradient(circle at 38% 32%, #fde68a 0%, #f59e0b 45%, #b45309 100%)",
+                    boxShadow: result?.outcome === "heads" && !spinning
+                      ? "0 0 50px rgba(245,158,11,0.9), 0 0 100px rgba(245,158,11,0.4)"
+                      : "0 0 20px rgba(245,158,11,0.3)",
+                    border: "3px solid rgba(253,230,138,0.4)",
+                  }}>
+                    {/* Rim ring */}
+                    <div style={{ position:"absolute", inset:6, borderRadius:"50%", border:"2px solid rgba(253,230,138,0.3)", pointerEvents:"none" }}/>
+                    {/* Shine */}
+                    <div style={{ position:"absolute", top:12, left:20, width:48, height:24, borderRadius:"50%", background:"rgba(255,255,255,0.3)", transform:"rotate(-30deg)", pointerEvents:"none" }}/>
+                    <Image src="/tangy-logo.png" alt="TANGY" width={110} height={130}
+                      style={{ objectFit:"contain", mixBlendMode:"screen", position:"relative", zIndex:1 }}/>
+                  </div>
+
+                  {/* TAILS face (back) */}
+                  <div className="coin-face coin-face-back" style={{
+                    background: "radial-gradient(circle at 38% 32%, #86efac 0%, #22c55e 45%, #14532d 100%)",
+                    boxShadow: result?.outcome === "tails" && !spinning
+                      ? "0 0 50px rgba(74,222,128,0.9), 0 0 100px rgba(74,222,128,0.4)"
+                      : "0 0 20px rgba(34,197,94,0.3)",
+                    border: "3px solid rgba(134,239,172,0.4)",
+                  }}>
+                    <div style={{ position:"absolute", inset:6, borderRadius:"50%", border:"2px solid rgba(134,239,172,0.3)", pointerEvents:"none" }}/>
+                    <div style={{ position:"absolute", top:12, left:20, width:48, height:24, borderRadius:"50%", background:"rgba(255,255,255,0.3)", transform:"rotate(-30deg)", pointerEvents:"none" }}/>
+                    <svg width="88" height="88" viewBox="0 0 72 72" fill="none" style={{ position:"relative", zIndex:1 }}>
+                      <circle cx="36" cy="38" r="28" fill="#166534" opacity=".9"/>
+                      <circle cx="36" cy="38" r="28" fill="none" stroke="rgba(255,255,255,0.35)" strokeWidth="2"/>
+                      <line x1="36" y1="10" x2="36" y2="66" stroke="rgba(255,255,255,0.28)" strokeWidth="2"/>
+                      <line x1="8" y1="38" x2="64" y2="38" stroke="rgba(255,255,255,0.28)" strokeWidth="2"/>
+                      <line x1="16" y1="18" x2="56" y2="58" stroke="rgba(255,255,255,0.2)" strokeWidth="1.5"/>
+                      <line x1="56" y1="18" x2="16" y2="58" stroke="rgba(255,255,255,0.2)" strokeWidth="1.5"/>
+                      <path d="M36 10 C38 5 42 3 46 5" stroke="#14532d" strokeWidth="3" strokeLinecap="round" fill="none"/>
+                      <circle cx="22" cy="24" r="5" fill="rgba(255,255,255,0.22)"/>
                     </svg>
-                  )}
+                  </div>
                 </div>
               </div>
-              {/* Shadow beneath coin */}
-              <div style={{ width:100, height:12, borderRadius:"50%", background:"rgba(0,0,0,0.4)", filter:"blur(6px)", margin:"8px auto 0" }}/>
+              {/* Ground shadow */}
+              <div style={{
+                width: spinning ? 60 : 120, height: 10, borderRadius: "50%",
+                background: "rgba(0,0,0,0.5)", filter: "blur(8px)",
+                marginTop: 6, transition: "width 0.3s ease",
+              }}/>
             </div>
 
             {/* Result */}
