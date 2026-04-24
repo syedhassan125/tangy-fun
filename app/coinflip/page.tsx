@@ -60,12 +60,12 @@ function CoinFlipGame() {
 
           {/* Coin display */}
           <div style={{
-            borderRadius: 20, overflow: "hidden",
+            borderRadius: 20, overflow: "visible",
             background: "linear-gradient(145deg, #001a0d 0%, #002618 60%, #001208 100%)",
             border: "1px solid rgba(16,185,129,0.2)",
             boxShadow: "0 0 60px rgba(16,185,129,0.06), 0 8px 40px rgba(0,0,0,0.5)",
-            minHeight: 360, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
-            gap: 24, position: "relative",
+            minHeight: 400, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+            gap: 28, position: "relative",
           }}>
             {/* Grid bg */}
             <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(rgba(16,185,129,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(16,185,129,0.04) 1px, transparent 1px)", backgroundSize: "40px 40px" }}/>
@@ -82,48 +82,59 @@ function CoinFlipGame() {
 
                   {/* HEADS face (front) */}
                   <div className="coin-face" style={{
-                    background: "radial-gradient(circle at 38% 32%, #fde68a 0%, #f59e0b 45%, #b45309 100%)",
+                    background: "radial-gradient(circle at 36% 30%, #fef3c7 0%, #fbbf24 30%, #f59e0b 60%, #92400e 100%)",
+                    border: "5px solid #d97706",
                     boxShadow: result?.outcome === "heads" && !spinning
-                      ? "0 0 50px rgba(245,158,11,0.9), 0 0 100px rgba(245,158,11,0.4)"
-                      : "0 0 20px rgba(245,158,11,0.3)",
-                    border: "3px solid rgba(253,230,138,0.4)",
+                      ? "0 0 0 3px #fbbf24, 0 0 40px rgba(245,158,11,0.9)"
+                      : "0 0 0 2px #b45309",
                   }}>
-                    {/* Rim ring */}
-                    <div style={{ position:"absolute", inset:6, borderRadius:"50%", border:"2px solid rgba(253,230,138,0.3)", pointerEvents:"none" }}/>
-                    {/* Shine */}
-                    <div style={{ position:"absolute", top:12, left:20, width:48, height:24, borderRadius:"50%", background:"rgba(255,255,255,0.3)", transform:"rotate(-30deg)", pointerEvents:"none" }}/>
-                    <Image src="/tangy-logo.png" alt="TANGY" width={110} height={130}
-                      style={{ objectFit:"contain", mixBlendMode:"screen", position:"relative", zIndex:1 }}/>
+                    {/* Rim */}
+                    <div style={{ position:"absolute", inset:8, borderRadius:"50%", border:"2px solid rgba(253,230,138,0.5)", pointerEvents:"none" }}/>
+                    {/* Shine arc */}
+                    <div style={{ position:"absolute", top:14, left:18, width:52, height:22, borderRadius:"50%", background:"rgba(255,255,255,0.35)", transform:"rotate(-25deg)", pointerEvents:"none" }}/>
+                    {/* TANGY text */}
+                    <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:2, position:"relative", zIndex:1 }}>
+                      <div style={{ fontFamily:"var(--font-orbitron)", fontWeight:900, fontSize:22, color:"#7c2d12", letterSpacing:2, textShadow:"0 1px 0 rgba(255,255,255,0.3)" }}>TANGY</div>
+                      <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                        <circle cx="16" cy="18" r="11" fill="#15803d" opacity=".9"/>
+                        <circle cx="16" cy="18" r="11" fill="none" stroke="rgba(255,255,255,0.3)" strokeWidth="1.5"/>
+                        <path d="M16 7 C17 4 20 3 22 4" stroke="#14532d" strokeWidth="2" strokeLinecap="round" fill="none"/>
+                        <line x1="16" y1="7" x2="16" y2="29" stroke="rgba(255,255,255,0.25)" strokeWidth="1"/>
+                        <line x1="5" y1="18" x2="27" y2="18" stroke="rgba(255,255,255,0.25)" strokeWidth="1"/>
+                      </svg>
+                    </div>
                   </div>
 
                   {/* TAILS face (back) */}
                   <div className="coin-face coin-face-back" style={{
-                    background: "radial-gradient(circle at 38% 32%, #86efac 0%, #22c55e 45%, #14532d 100%)",
+                    background: "radial-gradient(circle at 36% 30%, #dcfce7 0%, #4ade80 30%, #22c55e 60%, #14532d 100%)",
+                    border: "5px solid #16a34a",
                     boxShadow: result?.outcome === "tails" && !spinning
-                      ? "0 0 50px rgba(74,222,128,0.9), 0 0 100px rgba(74,222,128,0.4)"
-                      : "0 0 20px rgba(34,197,94,0.3)",
-                    border: "3px solid rgba(134,239,172,0.4)",
+                      ? "0 0 0 3px #4ade80, 0 0 40px rgba(74,222,128,0.9)"
+                      : "0 0 0 2px #15803d",
                   }}>
-                    <div style={{ position:"absolute", inset:6, borderRadius:"50%", border:"2px solid rgba(134,239,172,0.3)", pointerEvents:"none" }}/>
-                    <div style={{ position:"absolute", top:12, left:20, width:48, height:24, borderRadius:"50%", background:"rgba(255,255,255,0.3)", transform:"rotate(-30deg)", pointerEvents:"none" }}/>
-                    <svg width="88" height="88" viewBox="0 0 72 72" fill="none" style={{ position:"relative", zIndex:1 }}>
-                      <circle cx="36" cy="38" r="28" fill="#166534" opacity=".9"/>
-                      <circle cx="36" cy="38" r="28" fill="none" stroke="rgba(255,255,255,0.35)" strokeWidth="2"/>
-                      <line x1="36" y1="10" x2="36" y2="66" stroke="rgba(255,255,255,0.28)" strokeWidth="2"/>
-                      <line x1="8" y1="38" x2="64" y2="38" stroke="rgba(255,255,255,0.28)" strokeWidth="2"/>
-                      <line x1="16" y1="18" x2="56" y2="58" stroke="rgba(255,255,255,0.2)" strokeWidth="1.5"/>
-                      <line x1="56" y1="18" x2="16" y2="58" stroke="rgba(255,255,255,0.2)" strokeWidth="1.5"/>
-                      <path d="M36 10 C38 5 42 3 46 5" stroke="#14532d" strokeWidth="3" strokeLinecap="round" fill="none"/>
-                      <circle cx="22" cy="24" r="5" fill="rgba(255,255,255,0.22)"/>
-                    </svg>
+                    <div style={{ position:"absolute", inset:8, borderRadius:"50%", border:"2px solid rgba(134,239,172,0.5)", pointerEvents:"none" }}/>
+                    <div style={{ position:"absolute", top:14, left:18, width:52, height:22, borderRadius:"50%", background:"rgba(255,255,255,0.35)", transform:"rotate(-25deg)", pointerEvents:"none" }}/>
+                    <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:2, position:"relative", zIndex:1 }}>
+                      <div style={{ fontFamily:"var(--font-orbitron)", fontWeight:900, fontSize:22, color:"#052e16", letterSpacing:2, textShadow:"0 1px 0 rgba(255,255,255,0.3)" }}>TAILS</div>
+                      <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+                        <circle cx="18" cy="20" r="13" fill="#f59e0b" opacity=".9"/>
+                        <circle cx="18" cy="20" r="13" fill="none" stroke="rgba(255,255,255,0.3)" strokeWidth="1.5"/>
+                        <line x1="18" y1="7" x2="18" y2="33" stroke="rgba(255,255,255,0.3)" strokeWidth="1"/>
+                        <line x1="5" y1="20" x2="31" y2="20" stroke="rgba(255,255,255,0.3)" strokeWidth="1"/>
+                        <line x1="8" y1="10" x2="28" y2="30" stroke="rgba(255,255,255,0.2)" strokeWidth="1"/>
+                        <line x1="28" y1="10" x2="8" y2="30" stroke="rgba(255,255,255,0.2)" strokeWidth="1"/>
+                        <text x="18" y="24" textAnchor="middle" fontSize="10" fontWeight="bold" fill="rgba(120,53,15,0.9)" fontFamily="monospace">◎</text>
+                      </svg>
+                    </div>
                   </div>
                 </div>
               </div>
               {/* Ground shadow */}
               <div style={{
-                width: spinning ? 60 : 120, height: 10, borderRadius: "50%",
+                width: 120, height: 10, borderRadius: "50%",
                 background: "rgba(0,0,0,0.5)", filter: "blur(8px)",
-                marginTop: 6, transition: "width 0.3s ease",
+                marginTop: 8,
               }}/>
             </div>
 
