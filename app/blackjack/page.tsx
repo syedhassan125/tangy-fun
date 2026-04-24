@@ -315,7 +315,7 @@ function BlackjackGame() {
             <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: 3, textTransform: "uppercase", color: "#374151", marginBottom: 14 }}>Rules</div>
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {[
-                ["Blackjack pays", "6:5", "#10b981"],
+                ["Blackjack pays", "3:2", "#10b981"],
                 ["Dealer stands", "Hard 17", "#fff"],
                 ["Double on", "Any 2 cards", "#fff"],
                 ["House edge", "~5%", "#a78bfa"],
