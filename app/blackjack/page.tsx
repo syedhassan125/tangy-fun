@@ -48,34 +48,142 @@ function fullHandValue(cards:Card[]):number{
 }
 function isBlackjack(cards:Card[]):boolean{return cards.length===2&&fullHandValue(cards)===21;}
 
-/* ── Citrus Dealer Mascot ── */
-function DealerMascot() {
+/* ── Citrus Dealer Mascot (animated) ── */
+function DealerMascot({ phase, result }: { phase: string; result: GameResult|null }) {
+  const bodyClass = phase==="dealer" ? "mascot-deal"
+    : result?.outcome==="win"||result?.outcome==="blackjack" ? "mascot-celebrate"
+    : phase==="playing" ? "mascot-thinking"
+    : "mascot-idle";
+
   return (
-    <svg width="64" height="72" viewBox="0 0 64 72" fill="none" xmlns="http://www.w3.org/2000/svg">
-      {/* Dealer hat */}
-      <rect x="16" y="8" width="32" height="18" rx="4" fill="#1a0a00" stroke="rgba(245,158,11,0.6)" strokeWidth="1.5"/>
-      <rect x="10" y="24" width="44" height="5" rx="2.5" fill="#f59e0b"/>
-      <rect x="28" y="4" width="8" height="8" rx="2" fill="#f59e0b"/>
-      {/* Head */}
-      <circle cx="32" cy="44" r="18" fill="radial-gradient(circle, #4ade80, #16a34a)"/>
-      <circle cx="32" cy="44" r="18" fill="#22c55e"/>
-      <circle cx="32" cy="44" r="18" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="1.5"/>
-      {/* Citrus segments */}
-      <line x1="32" y1="26" x2="32" y2="62" stroke="rgba(255,255,255,0.2)" strokeWidth="1"/>
-      <line x1="14" y1="44" x2="50" y2="44" stroke="rgba(255,255,255,0.2)" strokeWidth="1"/>
-      <line x1="19" y1="31" x2="45" y2="57" stroke="rgba(255,255,255,0.15)" strokeWidth="1"/>
-      <line x1="45" y1="31" x2="19" y2="57" stroke="rgba(255,255,255,0.15)" strokeWidth="1"/>
-      {/* Eyes */}
-      <circle cx="25" cy="40" r="3.5" fill="#052e16"/>
-      <circle cx="39" cy="40" r="3.5" fill="#052e16"/>
-      <circle cx="26" cy="39" r="1" fill="rgba(255,255,255,0.6)"/>
-      <circle cx="40" cy="39" r="1" fill="rgba(255,255,255,0.6)"/>
-      {/* Smile */}
-      <path d="M24 50 Q32 56 40 50" stroke="#052e16" strokeWidth="2" fill="none" strokeLinecap="round"/>
-      {/* Bow tie */}
-      <path d="M26 62 L32 66 L38 62 L32 58 Z" fill="#f59e0b"/>
-      <circle cx="32" cy="62" r="2" fill="#d97706"/>
-    </svg>
+    <div className={bodyClass} style={{ position:"relative", width:90, height:100 }}>
+      <svg width="90" height="100" viewBox="0 0 90 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+        {/* Left arm */}
+        <g style={{ transformOrigin:"45px 70px",
+          animation: phase==="dealer" ? "mascot-arm-l 0.7s ease-in-out forwards" : "none" }}>
+          <rect x="8" y="62" width="22" height="8" rx="4" fill="#16a34a"
+            style={{ transformOrigin:"28px 66px",
+              transform: phase==="dealer" ? "rotate(-35deg) translateX(-8px)" : "rotate(15deg)",
+              transition:"transform 0.4s ease" }}/>
+          {/* Hand holding card when dealing */}
+          {(phase==="dealer"||phase==="playing") && (
+            <rect x="4" y="52" width="14" height="19" rx="3" fill="#fff" stroke="rgba(0,0,0,0.15)" strokeWidth="1"
+              style={{ transform: phase==="dealer" ? "rotate(-35deg) translate(-10px,-8px)" : "rotate(15deg)",
+                transition:"transform 0.4s ease", opacity: phase==="dealer" ? 1 : 0.6 }}/>
+          )}
+        </g>
+
+        {/* Right arm */}
+        <rect x="60" y="62" width="22" height="8" rx="4" fill="#16a34a"
+          style={{ transformOrigin:"60px 66px",
+            transform: phase==="dealer" ? "rotate(30deg) translateX(6px)" : "rotate(-15deg)",
+            transition:"transform 0.4s ease" }}/>
+
+        {/* Body */}
+        <rect x="30" y="60" width="30" height="28" rx="8" fill="#15803d"/>
+        <rect x="30" y="60" width="30" height="28" rx="8" fill="none" stroke="rgba(255,255,255,0.12)" strokeWidth="1"/>
+
+        {/* Bow tie */}
+        <path d="M36 68 L45 73 L54 68 L45 63 Z" fill="#f59e0b"/>
+        <circle cx="45" cy="68" r="3" fill="#d97706"/>
+
+        {/* Dealer hat */}
+        <rect x="22" y="14" width="46" height="24" rx="5" fill="#1a0a00" stroke="rgba(245,158,11,0.55)" strokeWidth="1.5"/>
+        <rect x="14" y="36" width="62" height="7" rx="3.5" fill="#f59e0b"/>
+        <rect x="40" y="6" width="10" height="10" rx="3" fill="#f59e0b"/>
+        {/* Hat band */}
+        <rect x="22" y="28" width="46" height="5" rx="1" fill="rgba(245,158,11,0.2)"/>
+
+        {/* Head */}
+        <circle cx="45" cy="56" r="24" fill="#22c55e"/>
+        <circle cx="45" cy="56" r="24" fill="radial-gradient(circle at 38% 32%, rgba(255,255,255,0.15) 0%, transparent 60%)"/>
+        <circle cx="45" cy="56" r="24" fill="none" stroke="rgba(255,255,255,0.18)" strokeWidth="1.5"/>
+
+        {/* Citrus segments */}
+        <line x1="45" y1="32" x2="45" y2="80" stroke="rgba(255,255,255,0.18)" strokeWidth="1"/>
+        <line x1="21" y1="56" x2="69" y2="56" stroke="rgba(255,255,255,0.18)" strokeWidth="1"/>
+        <line x1="28" y1="39" x2="62" y2="73" stroke="rgba(255,255,255,0.12)" strokeWidth="1"/>
+        <line x1="62" y1="39" x2="28" y2="73" stroke="rgba(255,255,255,0.12)" strokeWidth="1"/>
+
+        {/* Eyes with blink */}
+        <g className="eye-blink">
+          <circle cx="37" cy="52" r="4.5" fill="#052e16"/>
+          <circle cx="53" cy="52" r="4.5" fill="#052e16"/>
+          <circle cx="38.5" cy="50.5" r="1.5" fill="rgba(255,255,255,0.7)"/>
+          <circle cx="54.5" cy="50.5" r="1.5" fill="rgba(255,255,255,0.7)"/>
+        </g>
+
+        {/* Expression changes with phase */}
+        {(result?.outcome==="win"||result?.outcome==="blackjack") ? (
+          /* Big smile for win */
+          <path d="M34 62 Q45 72 56 62" stroke="#052e16" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+        ) : result?.outcome==="loss" ? (
+          /* Sad for loss */
+          <path d="M34 68 Q45 62 56 68" stroke="#052e16" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+        ) : (
+          /* Neutral smile */
+          <path d="M35 63 Q45 69 55 63" stroke="#052e16" strokeWidth="2" fill="none" strokeLinecap="round"/>
+        )}
+
+        {/* Shine on head */}
+        <ellipse cx="36" cy="43" rx="8" ry="4" fill="rgba(255,255,255,0.15)" transform="rotate(-20 36 43)"/>
+
+        {/* Speech bubble when thinking */}
+        {phase==="dealer" && (
+          <g>
+            <rect x="58" y="8" width="28" height="18" rx="8" fill="rgba(245,158,11,0.9)"/>
+            <path d="M64 26 L60 32 L68 26" fill="rgba(245,158,11,0.9)"/>
+            <text x="72" y="20" textAnchor="middle" fontSize="10" fontWeight="900" fill="#000">🤔</text>
+          </g>
+        )}
+        {(result?.outcome==="win"||result?.outcome==="blackjack") && (
+          <g>
+            <rect x="58" y="4" width="30" height="18" rx="8" fill="rgba(16,185,129,0.9)"/>
+            <path d="M64 22 L60 28 L68 22" fill="rgba(16,185,129,0.9)"/>
+            <text x="73" y="16" textAnchor="middle" fontSize="10" fontWeight="900" fill="#fff">🎉</text>
+          </g>
+        )}
+      </svg>
+    </div>
+  );
+}
+
+/* ── Open Seat / Player Seat ── */
+function PlayerSeat({ isBot, name, bet }: { isBot?: boolean; name?: string; bet?: number }) {
+  if (!isBot) {
+    return (
+      <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:8 }}>
+        <div className="seat-pulse" style={{
+          width:52, height:52, borderRadius:"50%",
+          background:"rgba(245,158,11,0.06)",
+          border:"2px dashed rgba(245,158,11,0.35)",
+          display:"flex", alignItems:"center", justifyContent:"center",
+          cursor:"pointer",
+        }}>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(245,158,11,0.5)" strokeWidth="1.8">
+            <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+          </svg>
+        </div>
+        <div style={{ fontSize:9, fontWeight:700, letterSpacing:2, color:"rgba(245,158,11,0.5)", textTransform:"uppercase" }}>Open Seat</div>
+        <div style={{ fontSize:8, color:"rgba(255,255,255,0.2)", background:"rgba(245,158,11,0.08)", border:"1px solid rgba(245,158,11,0.2)", borderRadius:100, padding:"3px 10px", cursor:"pointer" }}>JOIN</div>
+      </div>
+    );
+  }
+  return (
+    <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:6 }}>
+      <div style={{
+        width:52, height:52, borderRadius:"50%",
+        background:"linear-gradient(135deg,#374151,#1f2937)",
+        border:"2px solid rgba(255,255,255,0.12)",
+        boxShadow:"0 0 12px rgba(0,0,0,0.5)",
+        display:"flex", alignItems:"center", justifyContent:"center",
+        fontSize:22,
+      }}>🤖</div>
+      <div style={{ fontSize:9, fontWeight:700, color:"rgba(255,255,255,0.5)", letterSpacing:1 }}>{name}</div>
+      {bet && (
+        <div style={{ fontFamily:"var(--font-orbitron)", fontSize:9, fontWeight:800, color:"#f59e0b" }}>{bet} ◎</div>
+      )}
+    </div>
   );
 }
 
@@ -310,10 +418,18 @@ function BlackjackGame() {
             <div style={{position:"absolute",inset:16,borderRadius:165,border:"1px solid rgba(245,158,11,0.12)",pointerEvents:"none",zIndex:0}}/>
             <div style={{position:"absolute",inset:22,borderRadius:160,border:"1px solid rgba(245,158,11,0.06)",pointerEvents:"none",zIndex:0}}/>
 
+            {/* SEATS — left and right absolutely positioned */}
+            <div style={{position:"absolute",left:"6%",top:"52%",transform:"translateY(-50%)",zIndex:2}}>
+              <PlayerSeat isBot name="sol_ape" bet={0.5}/>
+            </div>
+            <div style={{position:"absolute",right:"6%",top:"52%",transform:"translateY(-50%)",zIndex:2}}>
+              <PlayerSeat/>
+            </div>
+
             {/* DEALER ZONE */}
-            <div style={{position:"relative",zIndex:1,display:"flex",flexDirection:"column",alignItems:"center",paddingTop:32,gap:12}}>
-              {/* Citrus dealer mascot */}
-              <DealerMascot/>
+            <div style={{position:"relative",zIndex:1,display:"flex",flexDirection:"column",alignItems:"center",paddingTop:24,gap:8}}>
+              {/* Animated citrus dealer mascot */}
+              <DealerMascot phase={phase} result={result}/>
               <div style={{fontSize:9,fontWeight:700,letterSpacing:4,color:"rgba(255,255,255,0.2)",textTransform:"uppercase"}}>DEALER</div>
 
               {/* Dealer cards */}
